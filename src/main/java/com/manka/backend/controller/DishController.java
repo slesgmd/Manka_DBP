@@ -1,0 +1,61 @@
+package com.manka.backend.controller;
+
+import com.manka.backend.dto.request.DishCreateRequest;
+import com.manka.backend.dto.request.DishUpdateRequest;
+import com.manka.backend.dto.response.DishDetailResponse;
+import com.manka.backend.dto.response.DishResponse;
+import com.manka.backend.service.DishService;
+import jakarta.validation.Valid;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/dishes")
+public class DishController {
+
+    private final DishService service;
+
+    public DishController(DishService service) {
+        this.service = service;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DishResponse>> findAll() {
+        return ResponseEntity.ok(service.findAll());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DishDetailResponse> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<DishDetailResponse> create(@Valid @RequestBody DishCreateRequest request) {
+        DishDetailResponse response = service.create(request);
+        return ResponseEntity.created(URI.create("/api/v1/dishes/" + response.id())).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DishDetailResponse> update(
+            @PathVariable Long id,
+            @Valid @RequestBody DishUpdateRequest request
+    ) {
+        return ResponseEntity.ok(service.update(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}

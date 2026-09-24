@@ -1,0 +1,41 @@
+# Academic reference material (local only)
+docs/
+
+# Maven build output and compiled files
+target/
+*.class
+out/
+
+# IDE and editor files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+*.swp
+*.swo
+*~
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+application-local.properties
+application-local.yml
+application-local.yaml
+application-secrets.properties
+application-secrets.yml
+application-secrets.yaml
+
+# Logs and temporary files
+logs/
+*.log
+*.tmp
+tmp/
+hs_err_pid*
+
+# Operating system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
