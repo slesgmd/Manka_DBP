@@ -104,6 +104,9 @@ class SecurityIntegrationTests {
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.status").value(401));
 
+        mockMvc.perform(get("/api/v1/recommendations").param("availableMinutes", "30"))
+                .andExpect(status().isUnauthorized());
+
         MvcResult result = register("Regular User", "regular.user@manka.test", "SecurePass2")
                 .andExpect(status().isCreated())
                 .andReturn();

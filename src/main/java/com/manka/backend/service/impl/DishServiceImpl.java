@@ -15,8 +15,8 @@ import com.manka.backend.service.DishService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.access.prepost.PreAuthorize;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 @Transactional
@@ -38,8 +38,9 @@ public class DishServiceImpl implements DishService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DishResponse> findAll() {
-        return dishRepository.findAll().stream().map(mapper::toResponse).toList();
+    public Page<DishResponse> search(String name, Integer maxPrepMinutes, Long proteinCategoryId, Pageable pageable) {
+        String filter = name == null || name.isBlank() ? null : name.trim();
+        return dishRepository.search(filter, maxPrepMinutes, proteinCategoryId, pageable).map(mapper::toResponse);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.manka.backend.service.impl;
 
-import com.manka.backend.exception.EmailDeliveryException;
 import com.manka.backend.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -79,7 +78,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(templateEngine.process(template, context), true);
             mailSender.send(message);
         } catch (MessagingException | MailException exception) {
-            throw new EmailDeliveryException("Email could not be delivered", exception);
+            LOGGER.warn("Email delivery failed: subject={}, recipient={}", subject, recipient, exception);
         }
     }
 }

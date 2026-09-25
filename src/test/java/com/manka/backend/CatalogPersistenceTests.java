@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -97,5 +99,30 @@ class CatalogPersistenceTests {
                 InvalidCatalogOperationException.class,
                 () -> ingredientService.update(root.getId(), new IngredientUpdateRequest("Root", childId))
         );
+    }
+
+    @Test
+    void searchesDishesByNameTimeAndCategoryWithPagination() {
+        ProteinCategory chicken = proteinCategoryRepository.save(new ProteinCategory("Pollo"));
+        ProteinCategory fish = proteinCategoryRepository.save(new ProteinCategory("Pescado"));
+        dishRepository.save(new Dish("Arroz con pollo", 45, chicken));
+        dishRepository.save(new Dish("Arroz chaufa", 25, chicken));
+        dishRepository.save(new Dish("Ceviche", 20, fish));
+
+        var page = dishRepository.search("ARROZ", 30, chicken.getId(),
+                PageRequest.of(0, 1, Sort.by("name")));
+        assertEquals(1, page.getTotalElements());
+        assertEquals("Arroz chaufa", page.getContent().getFirst().getName());
+    }
+
+    @Test
+    void searchesIngredientsIgnoringCaseAndPaginates() {
+        ingredientRepository.save(new Ingredient("Pollo"));
+        ingredientRepository.save(new Ingredient("Pechuga de pollo"));
+        ingredientRepository.save(new Ingredient("Arroz"));
+
+        var page = ingredientRepository.search("POLLO", PageRequest.of(0, 1, Sort.by("name")));
+        assertEquals(2, page.getTotalElements());
+        assertEquals(1, page.getContent().size());
     }
 }

@@ -7,6 +7,12 @@ import com.manka.backend.dto.response.DishResponse;
 import com.manka.backend.service.DishService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.annotation.Validated;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
-import java.util.List;
-
 @RestController
+@Validated
 @RequestMapping("/api/v1/dishes")
 public class DishController {
 
@@ -30,8 +35,13 @@ public class DishController {
     }
 
     @GetMapping
-    public ResponseEntity<List<DishResponse>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<Page<DishResponse>> findAll(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) @Min(1) Integer maxPrepMinutes,
+            @RequestParam(required = false) Long proteinCategoryId,
+            @PageableDefault(size = 20, sort = "name") Pageable pageable
+    ) {
+        return ResponseEntity.ok(service.search(name, maxPrepMinutes, proteinCategoryId, pageable));
     }
 
     @GetMapping("/{id}")

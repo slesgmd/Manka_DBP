@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface PantryItemRepository extends JpaRepository<PantryItem, Long> {
 
-    @EntityGraph(attributePaths = "ingredient")
+    @EntityGraph(attributePaths = {"ingredient", "ingredient.parentIngredient"})
     List<PantryItem> findAllByUserIdOrderByAddedAtDesc(Long userId);
 
     Optional<PantryItem> findByUserIdAndIngredientId(Long userId, Long ingredientId);
