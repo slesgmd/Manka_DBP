@@ -6,6 +6,8 @@ import com.manka.backend.exception.DuplicateResourceException;
 import com.manka.backend.mapper.CatalogMapper;
 import com.manka.backend.model.ProteinCategory;
 import com.manka.backend.repository.DishRepository;
+import com.manka.backend.repository.CookingHistoryRepository;
+import com.manka.backend.repository.FavoriteRepository;
 import com.manka.backend.repository.ProteinCategoryRepository;
 import com.manka.backend.service.impl.DishServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,12 @@ class DishServiceUnitTests {
 
     @Mock
     private ProteinCategoryRepository categoryRepository;
+
+    @Mock
+    private CookingHistoryRepository cookingHistoryRepository;
+
+    @Mock
+    private FavoriteRepository favoriteRepository;
 
     @Mock
     private CatalogMapper mapper;
@@ -67,5 +75,25 @@ class DishServiceUnitTests {
                 DuplicateResourceException.class,
                 () -> service.create(new DishCreateRequest("Lomo saltado", 35, 1L))
         );
+    }
+
+    @Test
+    void rejectsDeletingDishUsedByFavorites() {
+        var dish = new com.manka.backend.model.Dish("Favorited dish", 20, new ProteinCategory("Fish"));
+        dish.setId(7L);
+        when(dishRepository.findById(7L)).thenReturn(java.util.Optional.of(dish));
+        when(favoriteRepository.existsByDishId(7L)).thenReturn(true);
+
+        assertThrows(DuplicateResourceException.class, () -> service.delete(7L));
+    }
+
+    @Test
+    void rejectsDeletingDishUsedByCookingHistory() {
+        var dish = new com.manka.backend.model.Dish("Cooked dish", 20, new ProteinCategory("Fish"));
+        dish.setId(8L);
+        when(dishRepository.findById(8L)).thenReturn(java.util.Optional.of(dish));
+        when(cookingHistoryRepository.existsByDishId(8L)).thenReturn(true);
+
+        assertThrows(DuplicateResourceException.class, () -> service.delete(8L));
     }
 }

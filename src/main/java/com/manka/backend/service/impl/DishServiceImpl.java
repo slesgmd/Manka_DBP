@@ -10,6 +10,8 @@ import com.manka.backend.mapper.CatalogMapper;
 import com.manka.backend.model.Dish;
 import com.manka.backend.model.ProteinCategory;
 import com.manka.backend.repository.DishRepository;
+import com.manka.backend.repository.CookingHistoryRepository;
+import com.manka.backend.repository.FavoriteRepository;
 import com.manka.backend.repository.ProteinCategoryRepository;
 import com.manka.backend.service.DishService;
 import org.springframework.stereotype.Service;
@@ -24,15 +26,21 @@ public class DishServiceImpl implements DishService {
 
     private final DishRepository dishRepository;
     private final ProteinCategoryRepository categoryRepository;
+    private final CookingHistoryRepository cookingHistoryRepository;
+    private final FavoriteRepository favoriteRepository;
     private final CatalogMapper mapper;
 
     public DishServiceImpl(
             DishRepository dishRepository,
             ProteinCategoryRepository categoryRepository,
+            CookingHistoryRepository cookingHistoryRepository,
+            FavoriteRepository favoriteRepository,
             CatalogMapper mapper
     ) {
         this.dishRepository = dishRepository;
         this.categoryRepository = categoryRepository;
+        this.cookingHistoryRepository = cookingHistoryRepository;
+        this.favoriteRepository = favoriteRepository;
         this.mapper = mapper;
     }
 
@@ -76,7 +84,11 @@ public class DishServiceImpl implements DishService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void delete(Long id) {
-        dishRepository.delete(getDish(id));
+        Dish dish = getDish(id);
+        if (cookingHistoryRepository.existsByDishId(id) || favoriteRepository.existsByDishId(id)) {
+            throw new DuplicateResourceException("Dish " + id + " is used by cooking history or favorites");
+        }
+        dishRepository.delete(dish);
     }
 
     private Dish getDish(Long id) {

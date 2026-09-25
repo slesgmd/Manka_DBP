@@ -1,0 +1,4137 @@
+{
+  "info": {
+    "name": "Manka Backend — CS 2031",
+    "description": "Colección de la API Manka. Por defecto usa http://localhost:8080. Al desplegar en AWS, sustituya baseUrl por la URL pública del servicio; no se fija aquí una dirección de AWS. Ejecute Register/Login y luego consulte los recursos. Para operaciones de catálogo, inicie sesión con ADMIN o MANAGER. Los IDs iniciales son ejemplos y pueden variar según los datos; actualícelos tras cada POST.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "dishId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "ingredientId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "categoryId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "dishIngredientId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "pantryItemId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "favoriteId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "historyId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/register",
+            "description": "Crea una cuenta USER y devuelve tokens; use un correo nuevo en cada ejecución Rol: público.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code < 300) { const data = pm.response.json(); pm.collectionVariables.set('accessToken', data.accessToken); pm.collectionVariables.set('refreshToken', data.refreshToken); if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/register",
+                "description": "Crea una cuenta USER y devuelve tokens; use un correo nuevo en cada ejecución Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"<access-token>\",\n  \"refreshToken\": \"<refresh-token>\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInSeconds\": 900,\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"Demo User\",\n    \"email\": \"demo@example.invalid\",\n    \"roles\": [\n      \"USER\"\n    ],\n    \"enabled\": true,\n    \"createdAt\": \"2026-09-25T12:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/register",
+                "description": "Crea una cuenta USER y devuelve tokens; use un correo nuevo en cada ejecución Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/auth/register\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/register",
+                "description": "Crea una cuenta USER y devuelve tokens; use un correo nuevo en cada ejecución Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/auth/register\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "description": "Autentica usuario existente y renueva las variables de tokens Rol: público.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code < 300) { const data = pm.response.json(); pm.collectionVariables.set('accessToken', data.accessToken); pm.collectionVariables.set('refreshToken', data.refreshToken); if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/login",
+                "description": "Autentica usuario existente y renueva las variables de tokens Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"<access-token>\",\n  \"refreshToken\": \"<refresh-token>\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInSeconds\": 900,\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"Demo User\",\n    \"email\": \"demo@example.invalid\",\n    \"roles\": [\n      \"USER\"\n    ],\n    \"enabled\": true,\n    \"createdAt\": \"2026-09-25T12:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/login",
+                "description": "Autentica usuario existente y renueva las variables de tokens Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/auth/login\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/login",
+                "description": "Autentica usuario existente y renueva las variables de tokens Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"demo@example.invalid\",\n  \"password\": \"ExamplePass1\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/auth/login\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/refresh",
+            "description": "Rota el refresh token; el anterior deja de ser válido Rol: público.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code < 300) { const data = pm.response.json(); pm.collectionVariables.set('accessToken', data.accessToken); pm.collectionVariables.set('refreshToken', data.refreshToken); if (data.user && data.user.id) pm.collectionVariables.set('userId', data.user.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/refresh",
+                "description": "Rota el refresh token; el anterior deja de ser válido Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"accessToken\": \"<access-token>\",\n  \"refreshToken\": \"<refresh-token>\",\n  \"tokenType\": \"Bearer\",\n  \"expiresInSeconds\": 900,\n  \"user\": {\n    \"id\": 1,\n    \"name\": \"Demo User\",\n    \"email\": \"demo@example.invalid\",\n    \"roles\": [\n      \"USER\"\n    ],\n    \"enabled\": true,\n    \"createdAt\": \"2026-09-25T12:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/refresh",
+                "description": "Rota el refresh token; el anterior deja de ser válido Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/auth/refresh\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "description": "Revoca el refresh token indicado Rol: público.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/logout",
+                "description": "Revoca el refresh token indicado Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/auth/logout",
+                "description": "Revoca el refresh token indicado Rol: público.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/auth/logout\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get my profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/users/me",
+            "description": "Consulta el perfil propio sin exponer el hash de contraseña Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/users/me",
+                "description": "Consulta el perfil propio sin exponer el hash de contraseña Rol: autenticado."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"roles\": [\n    \"USER\"\n  ],\n  \"enabled\": true,\n  \"createdAt\": \"2026-09-25T12:00:00Z\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/users/me",
+                "description": "Consulta el perfil propio sin exponer el hash de contraseña Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/users/me\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/users",
+            "description": "Lista los usuarios Rol: ADMIN."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/users",
+                "description": "Lista los usuarios Rol: ADMIN."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Demo User\",\n    \"email\": \"demo@example.invalid\",\n    \"roles\": [\n      \"USER\"\n    ],\n    \"enabled\": true,\n    \"createdAt\": \"2026-09-25T12:00:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/users",
+                "description": "Lista los usuarios Rol: ADMIN."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/users\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/users",
+                "description": "Lista los usuarios Rol: ADMIN."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/users\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update roles",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
+            "description": "Reemplaza roles; valores admitidos USER, MANAGER y ADMIN Rol: ADMIN.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
+                "description": "Reemplaza roles; valores admitidos USER, MANAGER y ADMIN Rol: ADMIN.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Demo User\",\n  \"email\": \"demo@example.invalid\",\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ],\n  \"enabled\": true,\n  \"createdAt\": \"2026-09-25T12:00:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
+                "description": "Reemplaza roles; valores admitidos USER, MANAGER y ADMIN Rol: ADMIN.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/users/1/roles\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
+                "description": "Reemplaza roles; valores admitidos USER, MANAGER y ADMIN Rol: ADMIN.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/users/1/roles\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/users/{{userId}}/roles",
+                "description": "Reemplaza roles; valores admitidos USER, MANAGER y ADMIN Rol: ADMIN.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"roles\": [\n    \"USER\",\n    \"MANAGER\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/users/1/roles\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dishes",
+      "item": [
+        {
+          "name": "Search dishes",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dishes?name=arroz&maxPrepMinutes=60&proteinCategoryId={{categoryId}}&page=0&size=20&sort=name,asc",
+            "description": "Busca por nombre, tiempo y categoría con paginación Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes?name=arroz&maxPrepMinutes=60&proteinCategoryId={{categoryId}}&page=0&size=20&sort=name,asc",
+                "description": "Busca por nombre, tiempo y categoría con paginación Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"name\": \"Arroz con pollo\",\n      \"totalTimeMinutes\": 45,\n      \"proteinCategoryId\": 1,\n      \"proteinCategoryName\": \"Pollo\"\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"size\": 20,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get dish",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+            "description": "Obtiene un plato con ingredientes Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Obtiene un plato con ingredientes Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Arroz con pollo\",\n  \"totalTimeMinutes\": 45,\n  \"proteinCategoryId\": 1,\n  \"proteinCategoryName\": \"Pollo\",\n  \"ingredients\": [\n    {\n      \"id\": 1,\n      \"name\": \"arroz\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Obtiene un plato con ingredientes Rol: público."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create dish",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/dishes",
+            "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('dishId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes",
+                "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Arroz con pollo\",\n  \"totalTimeMinutes\": 45,\n  \"proteinCategoryId\": 1,\n  \"proteinCategoryName\": \"Pollo\",\n  \"ingredients\": [\n    {\n      \"id\": 1,\n      \"name\": \"arroz\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes",
+                "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/dishes\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes",
+                "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dishes\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes",
+                "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dishes\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes",
+                "description": "Agrega un plato al catálogo Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato de ejemplo\",\n  \"totalTimeMinutes\": 35,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/dishes\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update dish",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+            "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Arroz con pollo\",\n  \"totalTimeMinutes\": 45,\n  \"proteinCategoryId\": 1,\n  \"proteinCategoryName\": \"Pollo\",\n  \"ingredients\": [\n    {\n      \"id\": 1,\n      \"name\": \"arroz\"\n    }\n  ]\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Actualiza nombre, tiempo y categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Plato actualizado\",\n  \"totalTimeMinutes\": 40,\n  \"proteinCategoryId\": \"{{categoryId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete dish",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+            "description": "Elimina solo si no hay favoritos ni historial Rol: ADMIN o MANAGER."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Elimina solo si no hay favoritos ni historial Rol: ADMIN o MANAGER."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Elimina solo si no hay favoritos ni historial Rol: ADMIN o MANAGER."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Elimina solo si no hay favoritos ni historial Rol: ADMIN o MANAGER."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dishes/{{dishId}}",
+                "description": "Elimina solo si no hay favoritos ni historial Rol: ADMIN o MANAGER."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/dishes/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ingredients",
+      "item": [
+        {
+          "name": "Search ingredients",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/ingredients?name=arroz&page=0&size=20&sort=name,asc",
+            "description": "Busca ingredientes por nombre sin distinguir mayúsculas Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients?name=arroz&page=0&size=20&sort=name,asc",
+                "description": "Busca ingredientes por nombre sin distinguir mayúsculas Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"name\": \"arroz\",\n      \"parentIngredientId\": null,\n      \"parentIngredientName\": null\n    }\n  ],\n  \"totalElements\": 1,\n  \"totalPages\": 1,\n  \"size\": 20,\n  \"number\": 0,\n  \"first\": true,\n  \"last\": true\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get ingredient",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+            "description": "Obtiene ingrediente y variante padre Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Obtiene ingrediente y variante padre Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"arroz\",\n  \"parentIngredientId\": null,\n  \"parentIngredientName\": null\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Obtiene ingrediente y variante padre Rol: público."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create ingredient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/ingredients",
+            "description": "Crea ingrediente; parentIngredientId es opcional Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ingrediente de ejemplo\",\n  \"parentIngredientId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('ingredientId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients",
+                "description": "Crea ingrediente; parentIngredientId es opcional Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente de ejemplo\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"arroz\",\n  \"parentIngredientId\": null,\n  \"parentIngredientName\": null\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients",
+                "description": "Crea ingrediente; parentIngredientId es opcional Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente de ejemplo\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/ingredients\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients",
+                "description": "Crea ingrediente; parentIngredientId es opcional Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente de ejemplo\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/ingredients\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients",
+                "description": "Crea ingrediente; parentIngredientId es opcional Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente de ejemplo\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/ingredients\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update ingredient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+            "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"arroz\",\n  \"parentIngredientId\": null,\n  \"parentIngredientName\": null\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Actualiza nombre y padre; rechaza ciclos Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Ingrediente actualizado\",\n  \"parentIngredientId\": null\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete ingredient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+            "description": "Elimina solo si no se usa en platos, despensas o variantes Rol: ADMIN o MANAGER."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Elimina solo si no se usa en platos, despensas o variantes Rol: ADMIN o MANAGER."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Elimina solo si no se usa en platos, despensas o variantes Rol: ADMIN o MANAGER."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Elimina solo si no se usa en platos, despensas o variantes Rol: ADMIN o MANAGER."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/ingredients/{{ingredientId}}",
+                "description": "Elimina solo si no se usa en platos, despensas o variantes Rol: ADMIN o MANAGER."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/ingredients/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Protein Categories",
+      "item": [
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/protein-categories",
+            "description": "Lista categorías proteicas Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories",
+                "description": "Lista categorías proteicas Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"name\": \"Pollo\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get category",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+            "description": "Obtiene categoría por ID Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Obtiene categoría por ID Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Pollo\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Obtiene categoría por ID Rol: público."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/protein-categories",
+            "description": "Crea categoría Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoría de ejemplo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('categoryId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories",
+                "description": "Crea categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría de ejemplo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Pollo\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories",
+                "description": "Crea categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría de ejemplo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/protein-categories\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories",
+                "description": "Crea categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría de ejemplo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/protein-categories\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories",
+                "description": "Crea categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría de ejemplo\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/protein-categories\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update category",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+            "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"name\": \"Pollo\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Renombra categoría Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Categoría actualizada\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete category",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+            "description": "Elimina solo si no tiene platos Rol: ADMIN o MANAGER."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Elimina solo si no tiene platos Rol: ADMIN o MANAGER."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Elimina solo si no tiene platos Rol: ADMIN o MANAGER."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Elimina solo si no tiene platos Rol: ADMIN o MANAGER."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/protein-categories/{{categoryId}}",
+                "description": "Elimina solo si no tiene platos Rol: ADMIN o MANAGER."
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/protein-categories/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Dish Ingredients",
+      "item": [
+        {
+          "name": "List dish ingredients",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dish-ingredients",
+            "description": "Lista relaciones entre platos e ingredientes Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Lista relaciones entre platos e ingredientes Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"dishId\": 1,\n    \"dishName\": \"Arroz con pollo\",\n    \"ingredientId\": 1,\n    \"ingredientName\": \"arroz\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get dish ingredient",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+            "description": "Obtiene relación por ID Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Obtiene relación por ID Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"dishId\": 1,\n  \"dishName\": \"Arroz con pollo\",\n  \"ingredientId\": 1,\n  \"ingredientName\": \"arroz\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Obtiene relación por ID Rol: público."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Create dish ingredient",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/dish-ingredients",
+            "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('dishIngredientId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"dishId\": 1,\n  \"dishName\": \"Arroz con pollo\",\n  \"ingredientId\": 1,\n  \"ingredientName\": \"arroz\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/dish-ingredients\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dish-ingredients\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dish-ingredients\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients",
+                "description": "Agrega ingrediente a un plato Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/dish-ingredients\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update dish ingredient",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+            "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"dishId\": 1,\n  \"dishName\": \"Arroz con pollo\",\n  \"ingredientId\": 1,\n  \"ingredientName\": \"arroz\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Cambia el plato o ingrediente de la relación Rol: ADMIN o MANAGER.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\",\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete dish ingredient",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+            "description": "Quita el ingrediente de un plato Rol: ADMIN o MANAGER."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Quita el ingrediente de un plato Rol: ADMIN o MANAGER."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Forbidden",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Quita el ingrediente de un plato Rol: ADMIN o MANAGER."
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 403,\n  \"error\": \"Forbidden\",\n  \"message\": \"Access is denied\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/dish-ingredients/{{dishIngredientId}}",
+                "description": "Quita el ingrediente de un plato Rol: ADMIN o MANAGER."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/dish-ingredients/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Pantry",
+      "item": [
+        {
+          "name": "List pantry",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/pantry-items",
+            "description": "Lista los ingredientes de la despensa propia Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Lista los ingredientes de la despensa propia Rol: autenticado."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"ingredientId\": 1,\n    \"ingredientName\": \"arroz\",\n    \"addedAt\": \"2026-09-25T12:00:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Lista los ingredientes de la despensa propia Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/pantry-items\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add pantry item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/pantry-items",
+            "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('pantryItemId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"ingredientId\": 1,\n  \"ingredientName\": \"arroz\",\n  \"addedAt\": \"2026-09-25T12:00:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/pantry-items\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/pantry-items\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/pantry-items\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/pantry-items",
+                "description": "Añade un ingrediente a la despensa propia Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"ingredientId\": \"{{ingredientId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/pantry-items\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove pantry item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/pantry-items/{{ingredientId}}",
+            "description": "Quita por ID de ingrediente, no por ID del registro Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/pantry-items/{{ingredientId}}",
+                "description": "Quita por ID de ingrediente, no por ID del registro Rol: autenticado."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/pantry-items/{{ingredientId}}",
+                "description": "Quita por ID de ingrediente, no por ID del registro Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/pantry-items/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/pantry-items/{{ingredientId}}",
+                "description": "Quita por ID de ingrediente, no por ID del registro Rol: autenticado."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/pantry-items/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "List favorites",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/favorites",
+            "description": "Lista platos favoritos propios Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Lista platos favoritos propios Rol: autenticado."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"dishId\": 1,\n    \"dishName\": \"Arroz con pollo\",\n    \"totalTimeMinutes\": 45,\n    \"createdAt\": \"2026-09-25T12:00:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Lista platos favoritos propios Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/favorites\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add favorite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/favorites",
+            "description": "Marca plato favorito Rol: autenticado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('favoriteId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Marca plato favorito Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"dishId\": 1,\n  \"dishName\": \"Arroz con pollo\",\n  \"totalTimeMinutes\": 45,\n  \"createdAt\": \"2026-09-25T12:00:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Marca plato favorito Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/favorites\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Marca plato favorito Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/favorites\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Marca plato favorito Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/favorites\"\n}"
+            },
+            {
+              "name": "Conflict",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/favorites",
+                "description": "Marca plato favorito Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 409,\n  \"error\": \"Conflict\",\n  \"message\": \"Resource is in use\",\n  \"path\": \"/api/v1/favorites\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Remove favorite",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/favorites/{{dishId}}",
+            "description": "Quita por ID de plato, no por ID de favorito Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/favorites/{{dishId}}",
+                "description": "Quita por ID de plato, no por ID de favorito Rol: autenticado."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/favorites/{{dishId}}",
+                "description": "Quita por ID de plato, no por ID de favorito Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/favorites/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/favorites/{{dishId}}",
+                "description": "Quita por ID de plato, no por ID de favorito Rol: autenticado."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/favorites/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Cooking History",
+      "item": [
+        {
+          "name": "List history",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/cooking-history",
+            "description": "Consulta historial propio ordenado por fecha Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Consulta historial propio ordenado por fecha Rol: autenticado."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"id\": 1,\n    \"dishId\": 1,\n    \"dishName\": \"Arroz con pollo\",\n    \"cookedAt\": \"2026-09-25T12:00:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Consulta historial propio ordenado por fecha Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/cooking-history\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Add cooked dish",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/api/v1/cooking-history",
+            "description": "Registra plato cocinado; cookedAt es opcional Rol: autenticado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('historyId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "Created",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Registra plato cocinado; cookedAt es opcional Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": 1,\n  \"dishId\": 1,\n  \"dishName\": \"Arroz con pollo\",\n  \"cookedAt\": \"2026-09-25T12:00:00Z\"\n}"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Registra plato cocinado; cookedAt es opcional Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/cooking-history\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Registra plato cocinado; cookedAt es opcional Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/cooking-history\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{baseUrl}}/api/v1/cooking-history",
+                "description": "Registra plato cocinado; cookedAt es opcional Rol: autenticado.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"dishId\": \"{{dishId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/cooking-history\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete history entry",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/cooking-history/{{historyId}}",
+            "description": "Borra una entrada propia del historial Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "No Content",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/cooking-history/{{historyId}}",
+                "description": "Borra una entrada propia del historial Rol: autenticado."
+              },
+              "status": "No Content",
+              "code": 204,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": ""
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/cooking-history/{{historyId}}",
+                "description": "Borra una entrada propia del historial Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/cooking-history/1\"\n}"
+            },
+            {
+              "name": "Not Found",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/cooking-history/{{historyId}}",
+                "description": "Borra una entrada propia del historial Rol: autenticado."
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 404,\n  \"error\": \"Not Found\",\n  \"message\": \"Resource was not found\",\n  \"path\": \"/api/v1/cooking-history/1\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Recommendations",
+      "item": [
+        {
+          "name": "Get recommendations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/recommendations?availableMinutes=45&limit=10",
+            "description": "Ordena platos con cobertura positiva y muestra desglose de puntajes Rol: autenticado."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/recommendations?availableMinutes=45&limit=10",
+                "description": "Ordena platos con cobertura positiva y muestra desglose de puntajes Rol: autenticado."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "[\n  {\n    \"dishId\": 1,\n    \"name\": \"Arroz con pollo\",\n    \"prepTimeMinutes\": 45,\n    \"score\": 78.5,\n    \"coveragePercent\": 80,\n    \"missingIngredients\": [\n      \"huevo\"\n    ],\n    \"breakdown\": [\n      {\n        \"scorer\": \"coverage\",\n        \"score\": 80,\n        \"weight\": 0.35,\n        \"explanation\": \"Ingredientes disponibles\"\n      }\n    ]\n  }\n]"
+            },
+            {
+              "name": "Bad Request",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/recommendations?availableMinutes=45&limit=10",
+                "description": "Ordena platos con cobertura positiva y muestra desglose de puntajes Rol: autenticado."
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 400,\n  \"error\": \"Bad Request\",\n  \"message\": \"Request body is malformed\",\n  \"path\": \"/api/v1/recommendations\"\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/recommendations?availableMinutes=45&limit=10",
+                "description": "Ordena platos con cobertura positiva y muestra desglose de puntajes Rol: autenticado."
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"timestamp\": \"2026-09-25T12:00:00Z\",\n  \"status\": 401,\n  \"error\": \"Unauthorized\",\n  \"message\": \"Authentication is required\",\n  \"path\": \"/api/v1/recommendations\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Status/Health",
+      "item": [
+        {
+          "name": "Application status",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "noauth"
+            },
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/status",
+            "description": "Estado simple de la API Rol: público."
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/status",
+                "description": "Estado simple de la API Rol: público."
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"UP\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Actuator health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/actuator/health",
+            "description": "Salud pública para balanceador y monitoreo Rol: público.",
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) { const data = pm.response.json(); if (data.id) pm.collectionVariables.set('health', data.id); }"
+                ]
+              }
+            }
+          ],
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/actuator/health",
+                "description": "Salud pública para balanceador y monitoreo Rol: público.",
+                "auth": {
+                  "type": "noauth"
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"status\": \"UP\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

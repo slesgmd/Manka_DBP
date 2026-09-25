@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manka.backend.controller.DishController;
 import com.manka.backend.dto.response.DishDetailResponse;
 import com.manka.backend.exception.GlobalExceptionHandler;
+import com.manka.backend.exception.DuplicateResourceException;
 import com.manka.backend.exception.ResourceNotFoundException;
 import com.manka.backend.service.DishService;
 import com.manka.backend.security.JwtService;
@@ -21,11 +22,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(DishController.class)
+@WebMvcTest(value = DishController.class, excludeAutoConfiguration = org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration.class)
 @AutoConfigureMockMvc(addFilters = false)
 @Import(GlobalExceptionHandler.class)
 class DishControllerWebMvcTests {
@@ -83,5 +85,15 @@ class DishControllerWebMvcTests {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"));
+    }
+
+    @Test
+    void returns409WhenDishIsInUse() throws Exception {
+        org.mockito.Mockito.doThrow(new DuplicateResourceException("Dish 1 is used by favorites"))
+                .when(service).delete(1L);
+
+        mockMvc.perform(delete("/api/v1/dishes/1"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message").value("Dish 1 is used by favorites"));
     }
 }

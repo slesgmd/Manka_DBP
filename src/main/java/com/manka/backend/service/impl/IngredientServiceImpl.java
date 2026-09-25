@@ -9,6 +9,8 @@ import com.manka.backend.exception.ResourceNotFoundException;
 import com.manka.backend.mapper.CatalogMapper;
 import com.manka.backend.model.Ingredient;
 import com.manka.backend.repository.IngredientRepository;
+import com.manka.backend.repository.DishIngredientRepository;
+import com.manka.backend.repository.PantryItemRepository;
 import com.manka.backend.service.IngredientService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,10 +26,15 @@ import java.util.Set;
 public class IngredientServiceImpl implements IngredientService {
 
     private final IngredientRepository repository;
+    private final DishIngredientRepository dishIngredientRepository;
+    private final PantryItemRepository pantryItemRepository;
     private final CatalogMapper mapper;
 
-    public IngredientServiceImpl(IngredientRepository repository, CatalogMapper mapper) {
+    public IngredientServiceImpl(IngredientRepository repository, DishIngredientRepository dishIngredientRepository,
+                                 PantryItemRepository pantryItemRepository, CatalogMapper mapper) {
         this.repository = repository;
+        this.dishIngredientRepository = dishIngredientRepository;
+        this.pantryItemRepository = pantryItemRepository;
         this.mapper = mapper;
     }
 
@@ -50,7 +57,9 @@ public class IngredientServiceImpl implements IngredientService {
         String name = normalize(request.name());
         ensureUnique(name, null);
         Ingredient parent = findParent(request.parentIngredientId(), null);
-        return mapper.toResponse(repository.save(createEntity(name, parent)));
+        Ingredient ingredient = new Ingredient(name);
+        ingredient.setParentIngredient(parent);
+        return mapper.toResponse(repository.save(ingredient));
     }
 
     @Override
@@ -67,13 +76,12 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void delete(Long id) {
-        repository.delete(getIngredient(id));
-    }
-
-    private Ingredient createEntity(String name, Ingredient parent) {
-        Ingredient ingredient = new Ingredient(name);
-        ingredient.setParentIngredient(parent);
-        return ingredient;
+        Ingredient ingredient = getIngredient(id);
+        if (dishIngredientRepository.existsByIngredientId(id) || pantryItemRepository.existsByIngredientId(id)
+                || repository.existsByParentIngredientId(id)) {
+            throw new DuplicateResourceException("Ingredient " + id + " is used by dishes, pantry items or variants");
+        }
+        repository.delete(ingredient);
     }
 
     private Ingredient findParent(Long parentId, Long currentId) {

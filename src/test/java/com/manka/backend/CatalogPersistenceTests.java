@@ -6,12 +6,14 @@ import com.manka.backend.model.Ingredient;
 import com.manka.backend.model.ProteinCategory;
 import com.manka.backend.dto.request.IngredientUpdateRequest;
 import com.manka.backend.exception.InvalidCatalogOperationException;
+import com.manka.backend.exception.DuplicateResourceException;
 import com.manka.backend.mapper.CatalogMapper;
 import com.manka.backend.repository.DishIngredientRepository;
 import com.manka.backend.repository.DishRepository;
 import com.manka.backend.repository.IngredientRepository;
 import com.manka.backend.repository.ProteinCategoryRepository;
 import com.manka.backend.service.impl.IngredientServiceImpl;
+import com.manka.backend.service.impl.ProteinCategoryServiceImpl;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
-@Import({IngredientServiceImpl.class, CatalogMapper.class})
+@Import({IngredientServiceImpl.class, ProteinCategoryServiceImpl.class, CatalogMapper.class})
 class CatalogPersistenceTests {
 
     private final ProteinCategoryRepository proteinCategoryRepository;
@@ -34,6 +36,7 @@ class CatalogPersistenceTests {
     private final DishRepository dishRepository;
     private final DishIngredientRepository dishIngredientRepository;
     private final IngredientServiceImpl ingredientService;
+    private final ProteinCategoryServiceImpl categoryService;
     private final EntityManager entityManager;
 
     @Autowired
@@ -43,6 +46,7 @@ class CatalogPersistenceTests {
             DishRepository dishRepository,
             DishIngredientRepository dishIngredientRepository,
             IngredientServiceImpl ingredientService,
+            ProteinCategoryServiceImpl categoryService,
             EntityManager entityManager
     ) {
         this.proteinCategoryRepository = proteinCategoryRepository;
@@ -50,6 +54,7 @@ class CatalogPersistenceTests {
         this.dishRepository = dishRepository;
         this.dishIngredientRepository = dishIngredientRepository;
         this.ingredientService = ingredientService;
+        this.categoryService = categoryService;
         this.entityManager = entityManager;
     }
 
@@ -124,5 +129,33 @@ class CatalogPersistenceTests {
         var page = ingredientRepository.search("POLLO", PageRequest.of(0, 1, Sort.by("name")));
         assertEquals(2, page.getTotalElements());
         assertEquals(1, page.getContent().size());
+    }
+
+    @Test
+    void rejectsDeletingIngredientUsedByDish() {
+        ProteinCategory category = proteinCategoryRepository.save(new ProteinCategory("Used category"));
+        Ingredient ingredient = ingredientRepository.save(new Ingredient("Used ingredient"));
+        Dish dish = dishRepository.save(new Dish("Used dish", 20, category));
+        dishIngredientRepository.saveAndFlush(new DishIngredient(dish, ingredient));
+
+        assertThrows(DuplicateResourceException.class, () -> ingredientService.delete(ingredient.getId()));
+    }
+
+    @Test
+    void rejectsDeletingIngredientWithVariant() {
+        Ingredient parent = ingredientRepository.save(new Ingredient("Parent ingredient"));
+        Ingredient variant = new Ingredient("Variant ingredient");
+        variant.setParentIngredient(parent);
+        ingredientRepository.saveAndFlush(variant);
+
+        assertThrows(DuplicateResourceException.class, () -> ingredientService.delete(parent.getId()));
+    }
+
+    @Test
+    void rejectsDeletingCategoryUsedByDish() {
+        ProteinCategory category = proteinCategoryRepository.save(new ProteinCategory("Busy category"));
+        dishRepository.saveAndFlush(new Dish("Busy dish", 20, category));
+
+        assertThrows(DuplicateResourceException.class, () -> categoryService.delete(category.getId()));
     }
 }

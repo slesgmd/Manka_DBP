@@ -15,4 +15,6 @@ public interface DishIngredientRepository extends JpaRepository<DishIngredient, 
     boolean existsByDishIdAndIngredientId(Long dishId, Long ingredientId);
 
     boolean existsByDishIdAndIngredientIdAndIdNot(Long dishId, Long ingredientId, Long id);
+
+    boolean existsByIngredientId(Long ingredientId);
 }

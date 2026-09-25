@@ -1,6 +1,7 @@
 package com.manka.backend.service.impl;
 
 import com.manka.backend.service.EmailService;
+import com.manka.backend.exception.EmailDeliveryException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setText(templateEngine.process(template, context), true);
             mailSender.send(message);
         } catch (MessagingException | MailException exception) {
-            LOGGER.warn("Email delivery failed: subject={}, recipient={}", subject, recipient, exception);
+            throw new EmailDeliveryException("Email delivery failed for recipient " + recipient, exception);
         }
     }
 }

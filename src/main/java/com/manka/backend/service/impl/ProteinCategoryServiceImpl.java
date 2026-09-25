@@ -8,6 +8,7 @@ import com.manka.backend.exception.ResourceNotFoundException;
 import com.manka.backend.mapper.CatalogMapper;
 import com.manka.backend.model.ProteinCategory;
 import com.manka.backend.repository.ProteinCategoryRepository;
+import com.manka.backend.repository.DishRepository;
 import com.manka.backend.service.ProteinCategoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +21,13 @@ import java.util.List;
 public class ProteinCategoryServiceImpl implements ProteinCategoryService {
 
     private final ProteinCategoryRepository repository;
+    private final DishRepository dishRepository;
     private final CatalogMapper mapper;
 
-    public ProteinCategoryServiceImpl(ProteinCategoryRepository repository, CatalogMapper mapper) {
+    public ProteinCategoryServiceImpl(ProteinCategoryRepository repository, DishRepository dishRepository,
+                                      CatalogMapper mapper) {
         this.repository = repository;
+        this.dishRepository = dishRepository;
         this.mapper = mapper;
     }
 
@@ -60,7 +64,11 @@ public class ProteinCategoryServiceImpl implements ProteinCategoryService {
     @Override
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public void delete(Long id) {
-        repository.delete(getCategory(id));
+        ProteinCategory category = getCategory(id);
+        if (dishRepository.existsByProteinCategoryId(id)) {
+            throw new DuplicateResourceException("Protein category " + id + " is used by dishes");
+        }
+        repository.delete(category);
     }
 
     private ProteinCategory getCategory(Long id) {

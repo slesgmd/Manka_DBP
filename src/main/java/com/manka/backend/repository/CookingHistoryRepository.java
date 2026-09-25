@@ -17,4 +17,6 @@ public interface CookingHistoryRepository extends JpaRepository<CookingHistory, 
     List<Object[]> countByDish();
 
     Optional<CookingHistory> findByIdAndUserId(Long id, Long userId);
+
+    boolean existsByDishId(Long dishId);
 }

@@ -17,6 +17,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     boolean existsByUserIdAndDishId(Long userId, Long dishId);
 
+    boolean existsByDishId(Long dishId);
+
     @Query("select f.dish.id, count(f) from Favorite f group by f.dish.id")
     List<Object[]> countByDish();
 }

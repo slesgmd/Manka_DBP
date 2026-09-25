@@ -34,4 +34,6 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     boolean existsByNameIgnoreCase(String name);
 
     boolean existsByNameIgnoreCaseAndIdNot(String name, Long id);
+
+    boolean existsByProteinCategoryId(Long proteinCategoryId);
 }
