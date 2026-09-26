@@ -36,7 +36,7 @@ Después de registrarse, el usuario añade ingredientes a su despensa e indica c
 
 La API también permite buscar platos por nombre, tiempo y categoría; buscar ingredientes; guardar favoritos; y registrar el historial de cocina. Las listas de platos e ingredientes tienen paginación. Los usuarios con rol `ADMIN` o `MANAGER` pueden administrar el catálogo. El proyecto incluye un catálogo inicial de platos peruanos para probar las recomendaciones.
 
-Usamos Java 25, Spring Boot 3.5.4, Spring Web, Spring Data JPA, Spring Security y PostgreSQL. Las pruebas usan H2; Maven, Docker y Postman sirven para ejecutar y revisar el proyecto. Las contraseñas se guardan con BCrypt y los JWT se generan con JJWT. Esta entrega se centra en el backend hecho en Spring Boot con PostgreSQL en Railway.
+Usamos Java 25, Spring Boot 3.5.4, Spring Web, Spring Data JPA, Spring Security y PostgreSQL. Las pruebas usan H2; Maven, Docker y Postman sirven para ejecutar y revisar el proyecto. Springdoc genera la documentación OpenAPI y la interfaz Swagger UI. Las contraseñas se guardan con BCrypt y los JWT se generan con JJWT. Esta entrega se centra en el backend hecho en Spring Boot con PostgreSQL en Railway.
 
 ## Modelo de entidades
 
@@ -74,6 +74,8 @@ Se publican eventos cuando alguien se registra, cocina un plato o agrega un favo
 ## Endpoints
 
 La colección [postman_collection.json](postman_collection.json) incluye las solicitudes, ejemplos de respuesta y una breve descripción de cada ruta. La variable `{{baseUrl}}` usa Railway; para probar localmente se cambia a `http://localhost:8080`. La colección usa `{{accessToken}}` para las rutas protegidas. Registro, login, renovación de token y salud son públicos. Todas las rutas de la API empiezan con `/api/v1`, salvo Actuator.
+
+La documentación generada se puede consultar en [Swagger UI](https://mankadbp-production.up.railway.app/swagger-ui.html) y el contrato OpenAPI en formato JSON está en [`/v3/api-docs`](https://mankadbp-production.up.railway.app/v3/api-docs).
 
 | Recurso | Rutas y métodos | Acceso principal |
 | --- | --- | --- |

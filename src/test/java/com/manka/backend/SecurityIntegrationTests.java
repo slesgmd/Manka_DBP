@@ -67,6 +67,13 @@ class SecurityIntegrationTests {
     private IngredientRepository ingredientRepository;
 
     @Test
+    void exposesOpenApiDocumentationWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.info.title").value("Manka API"));
+    }
+
+    @Test
     void registersUserStoresPasswordHashAndAllowsAuthenticatedProfile() throws Exception {
         String email = "security.profile@manka.test";
         String password = "SecurePass1";
