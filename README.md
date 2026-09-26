@@ -18,60 +18,62 @@
 10. [Instalación y ejecución local](#instalación-y-ejecución-local)
 11. [Despliegue](#despliegue)
 12. [GitHub y gestión](#github-y-gestión)
-13. [Conclusión](#conclusión)
-14. [Apéndices](#apéndices)
+13. [Apuntes en Obsidian](#apuntes-en-obsidian)
+14. [Conclusión](#conclusión)
+15. [Apéndices](#apéndices)
 
 ## Introducción
 
-Manka ayuda a elegir una comida realizable con los ingredientes disponibles y el tiempo que queda para cocinar. El objetivo principal no es acumular recetas: es presentar opciones ordenadas y explicar por qué una conviene más que otra. Este repositorio contiene la API del proyecto académico. Permite mantener un catálogo de platos e ingredientes, registrar la despensa y el historial individual, y obtener recomendaciones. La colección de Postman incluida facilita recorrer el flujo completo sin depender de una interfaz gráfica.
+Manka es una API para ayudar a decidir qué cocinar con los ingredientes que hay en casa y el tiempo disponible. El usuario guarda su despensa, consulta platos y recibe una lista ordenada de recomendaciones. En este repositorio está el backend del proyecto; la colección de Postman permite probarlo sin tener un frontend.
 
 ## Identificación del problema
 
-Al llegar a casa, muchas personas tienen alimentos sueltos, poco tiempo y ninguna decisión tomada. Una búsqueda tradicional por ingrediente puede mostrar recetas que todavía requieren numerosas compras o que tardan más de lo disponible. Tampoco suele considerar que el usuario ya cocinó el mismo plato recientemente. La propuesta original de Manka plantea empezar con preparaciones peruanas y priorizar una decisión rápida y explicable. Resolver este problema reduce desperdicio potencial, hace mejor uso de la despensa y evita revisar manualmente muchas recetas antes de cocinar.
+Muchas veces hay ingredientes en casa, pero no está claro qué plato preparar con ellos. Buscar recetas una por una toma tiempo y puede terminar en opciones para las que faltan ingredientes. Además, repetir siempre el mismo plato no resulta muy útil. La idea fue empezar con platos peruanos y ordenar las opciones según lo que cada usuario tiene, cuánto tarda la preparación y lo que cocinó antes.
 
 ## Descripción de la solución
 
-El usuario autenticado añade ingredientes a su despensa, indica los minutos disponibles y solicita recomendaciones. El motor calcula cinco componentes entre 0 y 100: cobertura de ingredientes, ajuste al tiempo, variedad de proteína, repetición reciente y popularidad a partir de actividad. El puntaje final es `0.35 × cobertura + 0.20 × tiempo + 0.10 × variedad + 0.20 × repetición + 0.15 × popularidad`. Los pesos se configuran por variables y deben sumar 1. Solo se ofrecen platos con cobertura positiva; el resultado incluye porcentaje cubierto, ingredientes faltantes y desglose. Si un plato no tiene ingredientes, su cobertura es cero y no aparece en recomendaciones.
+Después de registrarse, el usuario añade ingredientes a su despensa e indica cuántos minutos tiene. El sistema puntúa cada plato según cinco criterios: ingredientes disponibles (35 %), tiempo (20 %), variedad de proteína (10 %), repetición reciente (20 %) y popularidad (15 %). Los pesos se pueden cambiar por variables de entorno, siempre que sumen 100 %. La respuesta muestra el puntaje y los ingredientes que faltan. Un plato sin ingredientes registrados no aparece como recomendación.
 
-También hay búsqueda de platos por nombre, duración y categoría con paginación; búsqueda paginada de ingredientes por nombre; variantes de ingredientes; favoritos; historial de platos cocinados; y administración del catálogo según rol. Los datos iniciales ofrecen platos peruanos para probar el flujo, pero el catálogo puede ampliarse. El historial y los favoritos alimentan los componentes de repetición y popularidad.
+La API también permite buscar platos por nombre, tiempo y categoría; buscar ingredientes; guardar favoritos; y registrar el historial de cocina. Las listas de platos e ingredientes tienen paginación. Los usuarios con rol `ADMIN` o `MANAGER` pueden administrar el catálogo. El proyecto incluye un catálogo inicial de platos peruanos para probar las recomendaciones.
 
-La implementación usa Java 25, Spring Boot 3.5.4, Spring Web, Spring Data JPA, Spring Security, PostgreSQL, H2 para pruebas, Maven, Docker y Postman. Las contraseñas se codifican con BCrypt y los tokens se manejan con JJWT. La propuesta original contemplaba Next.js, Prisma y Supabase; el backend entregado se implementó en Spring Boot y PostgreSQL conforme al curso. No se afirma que el prototipo frontend forme parte de este repositorio ni que se hayan desplegado servicios externos.
+Usamos Java 25, Spring Boot 3.5.4, Spring Web, Spring Data JPA, Spring Security y PostgreSQL. Las pruebas usan H2; Maven, Docker y Postman sirven para ejecutar y revisar el proyecto. Las contraseñas se guardan con BCrypt y los JWT se generan con JJWT. Esta entrega se centra en el backend hecho en Spring Boot con PostgreSQL en Railway.
 
 ## Modelo de entidades
 
-```mermaid
-erDiagram
-    USER ||--o{ PANTRY_ITEM : tiene
-    USER ||--o{ FAVORITE : guarda
-    USER ||--o{ COOKING_HISTORY : cocina
-    USER ||--o{ REFRESH_TOKEN : renueva
-    USER }o--o{ ROLE : posee
-    PROTEIN_CATEGORY ||--o{ DISH : agrupa
-    DISH ||--o{ DISH_INGREDIENT : requiere
-    INGREDIENT ||--o{ DISH_INGREDIENT : integra
-    INGREDIENT ||--o{ PANTRY_ITEM : disponible
-    INGREDIENT ||--o{ INGREDIENT : variante
-    DISH ||--o{ FAVORITE : favorito
-    DISH ||--o{ COOKING_HISTORY : registrado
-```
+![Modelo entidad-relación de Manka en notación de Chen](assets/modelo-chen.svg)
 
-`DishIngredient` representa la relación entre plato e ingrediente y evita duplicados. `Ingredient` permite que una variante apunte a su ingrediente padre. `ProteinCategory` clasifica platos; `CookingHistory` almacena fecha y usuario; `PantryItem` y `Favorite` pertenecen a un usuario. `User` conserva nombre, correo, hash de contraseña y estado; `Role` define permisos, y `RefreshToken` respalda la renovación y revocación. Las entidades usan claves foráneas y restricciones de unicidad; los DTO separan la representación pública de los modelos persistidos.
+[Abrir el diagrama Chen a tamaño completo](assets/modelo-chen.svg). Los rectángulos representan entidades, los rombos relaciones y los óvalos atributos; la clave principal de cada entidad está subrayada. Los números `1` y `N` indican la cardinalidad. Se muestran las claves principales para que el dibujo siga siendo legible.
+
+| Entidad | Atributos principales |
+| --- | --- |
+| `User` | `id`, `name`, `email`, `passwordHash`, `enabled`, `createdAt` |
+| `Role` | `id`, `name` |
+| `RefreshToken` | `id`, `tokenHash`, `expiresAt`, `revoked`, `createdAt` |
+| `Ingredient` | `id`, `name`, `parentIngredient` |
+| `Dish` | `id`, `name`, `totalTimeMinutes`, `proteinCategory` |
+| `ProteinCategory` | `id`, `name` |
+| `DishIngredient` | `id`, `dish`, `ingredient` |
+| `PantryItem` | `id`, `user`, `ingredient`, `addedAt` |
+| `Favorite` | `id`, `user`, `dish`, `createdAt` |
+| `CookingHistory` | `id`, `user`, `dish`, `cookedAt` |
+
+`Dish` guarda nombre y tiempo de preparación; `Ingredient` guarda nombre y puede apuntar a otro ingrediente para representar variantes, como pechuga de pollo y pollo. `DishIngredient` une platos con ingredientes y evita relaciones duplicadas. `ProteinCategory` agrupa platos. `PantryItem`, `Favorite` y `CookingHistory` guardan información propia de cada usuario, incluida la fecha de la acción. `User` tiene nombre, correo, contraseña codificada y roles; `RefreshToken` guarda vencimiento y revocación de la sesión. Las relaciones usan claves foráneas y restricciones de unicidad. Para las respuestas HTTP usamos DTOs y no exponemos las entidades directamente.
 
 ## Manejo de errores
 
-Un manejador global responde con `timestamp`, `status`, `error`, `message` y `path`. Se utiliza 400 para cuerpos o parámetros inválidos, 401 para credenciales o tokens incorrectos, 403 para acceso sin permiso, 404 para recursos inexistentes y 409 para nombres duplicados o relaciones activas que impiden eliminar. Los errores inesperados reciben 500 sin revelar detalles internos. Las validaciones de DTO impiden nombres vacíos, IDs no positivos y tiempos fuera de rango. Las restricciones de base de datos siguen siendo una última defensa, incluso si dos solicitudes concurrentes superan las comprobaciones previas.
+El proyecto usa `GlobalExceptionHandler` para que los errores tengan el mismo formato: fecha, código, tipo, mensaje y ruta. Devuelve 400 si los datos son inválidos, 401 si falla la autenticación, 403 si faltan permisos, 404 si no existe el recurso y 409 si hay un duplicado o una restricción de datos. Los errores inesperados reciben 500 sin mostrar detalles internos. También validamos los DTOs con `@Valid` y anotaciones como `@NotBlank`, `@Email` y `@Positive`.
 
 ## Medidas de seguridad
 
-El registro asigna el rol `USER`; los roles `MANAGER` y `ADMIN` habilitan cambios de catálogo, y solo `ADMIN` gestiona roles de usuarios. El acceso se valida con JWT de corta duración y refresh tokens rotativos. Las claves, credenciales de base de datos y configuración SMTP proceden del entorno, no del repositorio. La sesión HTTP es stateless. CORS limita los orígenes configurados; no debe usarse un comodín en producción. CSRF está deshabilitado porque la API usa tokens Bearer y no una sesión basada en cookies. Las consultas JPA parametrizadas y la serialización de DTO reducen la exposición de datos y los riesgos de inyección. La interfaz que consuma el API deberá escapar contenido no confiable para prevenir XSS.
+Al registrarse, una cuenta recibe el rol `USER`. `MANAGER` y `ADMIN` pueden editar el catálogo; solo `ADMIN` puede cambiar roles. Spring Security verifica los JWT y los permisos de cada operación. Los access tokens duran poco y los refresh tokens se pueden revocar. El secreto JWT y las contraseñas de la base se configuran fuera del repositorio. CORS acepta los orígenes configurados. La API usa Bearer tokens, por eso no mantiene sesiones HTTP ni usa cookies para autenticar. Las consultas con JPA y los DTOs ayudan a evitar inyección SQL y exposición de contraseñas; el frontend deberá escapar el texto que muestre para evitar XSS.
 
 ## Eventos y asincronía
 
-Al registrar un usuario, marcar un plato como cocinado o añadir un favorito se publican eventos personalizados que extienden `ApplicationEvent`, siguiendo el patrón del laboratorio. Los listeners actúan después del commit para no avisar sobre operaciones revertidas. El correo de bienvenida y la confirmación de cocina se envían mediante un ejecutor `@Async`; el registro de actividad de favoritos también es asíncrono. Así, el tiempo de respuesta HTTP no depende de SMTP o del registro secundario. Si falla el correo, `EmailDeliveryException` permite que el manejador de fallos asíncronos lo registre; la operación de negocio ya confirmada no se revierte. El envío está desactivado por defecto.
+Se publican eventos cuando alguien se registra, cocina un plato o agrega un favorito. Los listeners se ejecutan después de guardar la operación en la base, para no procesar eventos de cambios que fallaron. El correo de bienvenida, la confirmación de cocina y el registro de actividad se ejecutan con `@Async`. Así la respuesta de la API no espera al correo. Si el envío falla, se registra el error. El correo está desactivado por defecto y requiere configurar SMTP para usarlo.
 
 ## Endpoints
 
-Todos los contratos, cuerpos y respuestas de ejemplo están en [postman_collection.json](postman_collection.json). `{{baseUrl}}` apunta inicialmente a `http://localhost:8080` y la autorización de colección usa `{{accessToken}}`. Registro, inicio de sesión, renovación y salud no exigen Bearer. Las rutas tienen prefijo `/api/v1`, salvo Actuator.
+La colección [postman_collection.json](postman_collection.json) incluye las solicitudes, ejemplos de respuesta y una breve descripción de cada ruta. La variable `{{baseUrl}}` usa Railway; para probar localmente se cambia a `http://localhost:8080`. La colección usa `{{accessToken}}` para las rutas protegidas. Registro, login, renovación de token y salud son públicos. Todas las rutas de la API empiezan con `/api/v1`, salvo Actuator.
 
 | Recurso | Rutas y métodos | Acceso principal |
 | --- | --- | --- |
@@ -102,44 +104,48 @@ flowchart LR
     AsyncExecutor --> Email
 ```
 
-Los controladores reciben y validan HTTP; los servicios aplican reglas y transacciones; los repositorios consultan la base. Los mappers forman respuestas sin publicar entidades completas. El motor de recomendación mantiene scorers independientes para poder probar cada criterio. Los eventos separan acciones complementarias del flujo principal.
+Los controladores reciben las peticiones y validan sus datos. Los servicios contienen las reglas del proyecto y llaman a los repositorios para consultar PostgreSQL. Los mappers preparan las respuestas de la API. La recomendación está separada en criterios pequeños para poder probar cada puntaje. Los eventos dejan el correo y el registro de actividad fuera del flujo principal.
 
 ## Instalación y ejecución local
 
-Se necesitan JDK 25, Maven y Docker con Compose para la opción en contenedores. Copie `.env.example` a `.env` y reemplace la contraseña de PostgreSQL y `JWT_SECRET` por valores locales propios; el secreto JWT debe ser aleatorio y suficientemente largo. `.env` no debe versionarse. Para ejecutar todo el conjunto:
+Para ejecutar con contenedores se necesita Docker Compose. Copie `.env.example` a `.env` y cambie `DB_PASSWORD` y `JWT_SECRET` por valores propios. El secreto JWT debe tener al menos 32 bytes. `.env` está excluido de Git. Luego ejecute:
 
 ```sh
 docker compose up --build -d
 docker compose ps
 ```
 
-Compruebe `http://localhost:8080/actuator/health` e importe la colección Postman. Los IDs de ejemplo de la colección pueden variar; use los que devuelva la API. Para arrancar con Maven, levante solo PostgreSQL con `docker compose up -d db`, exporte las variables de `.env` en la terminal o configúrelas en el IDE, cambie `DB_URL` a `jdbc:postgresql://localhost:5432/manka` y ejecute:
+Abra `http://localhost:8080/actuator/health` para comprobar que arrancó. También puede importar Postman y cambiar `baseUrl` a esa dirección. Los IDs de la colección son ejemplos; se deben reemplazar por los que devuelva cada `POST`.
+
+Para ejecutar la aplicación fuera de Docker se necesita JDK 25. Levante PostgreSQL con `docker compose up -d db`, configure las variables de `.env` en la terminal o el IDE y cambie `DB_URL` a `jdbc:postgresql://localhost:5432/manka`. Después use el Maven Wrapper incluido:
 
 ```sh
-mvn spring-boot:run
-mvn clean test
+./mvnw spring-boot:run
+./mvnw clean verify
 ```
 
-Spring Boot no carga `.env` automáticamente cuando se ejecuta con Maven. El inicializador crea roles y puede crear un administrador si se configuran `ADMIN_EMAIL` y `ADMIN_PASSWORD` antes del primer arranque. Esas credenciales deben ser propias y seguras; después use `/api/v1/auth/login` para obtener su token ADMIN. Si el correo ya existe, el inicializador no cambia su rol. El seed de catálogo se controla con `MANKA_SEED_ENABLED` y solo actúa sobre un catálogo vacío.
+En Windows se usa `mvnw.cmd` en lugar de `./mvnw`. Spring Boot no lee `.env` automáticamente si se ejecuta con Maven. Al iniciar, la aplicación crea los roles y, si el catálogo está vacío, carga platos e ingredientes de ejemplo. `MANKA_SEED_ENABLED` permite desactivar esa carga. Para crear una cuenta administradora en el primer arranque se pueden definir `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
 
 ## Despliegue
 
-**URL pública:** `[COMPLETAR: URL de AWS]`. Se prevé construir la imagen Docker y ejecutarla manualmente en Amazon ECS, con PostgreSQL administrado en Amazon RDS. Este repositorio no realiza el despliegue ni crea infraestructura. En la tarea de ECS configure `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST` y `MAIL_FROM`; ajuste `MAIL_ENABLED`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_SMTP_AUTH` y `MAIL_STARTTLS` según el proveedor de correo. Con correo deshabilitado, `MAIL_HOST` y `MAIL_FROM` todavía deben estar definidos por el perfil `prod`. Opcionalmente defina `PORT`, `JPA_DDL_AUTO`, `MANKA_SEED_ENABLED`, `ADMIN_EMAIL` y `ADMIN_PASSWORD`. No coloque secretos en la imagen ni en el repositorio.
+**URL pública (Railway):** [https://mankadbp-production.up.railway.app/](https://mankadbp-production.up.railway.app/). La instancia pública está de forma temporal en Railway, donde hay un servicio para la API y otro para PostgreSQL con volumen. AWS queda pendiente para una siguiente etapa. La API tiene `/actuator/health` para comprobar que está en línea.
 
-El JDBC URL admite `jdbc:postgresql://host:5432/dbname` y parámetros adicionales como `?sslmode=require`; para verificar la identidad de RDS, configure certificado y modo SSL apropiado. Abra únicamente la conectividad necesaria entre ECS y RDS, exponga el puerto 8080 del contenedor o el valor de `PORT`, y use `/actuator/health` como comprobación del balanceador. El valor inicial `JPA_DDL_AUTO=update` facilita una base nueva para la entrega académica; en un entorno duradero conviene gestionar migraciones antes de usar `validate`. Falta que el equipo cree RDS, repositorio de imágenes, servicio ECS, DNS/TLS y secretos, publique la imagen y pruebe el flujo externo.
+En el servicio de Railway se deben configurar `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST` y `MAIL_FROM`; `PORT` lo proporciona la plataforma. El correo se activa con `MAIL_ENABLED` y las demás variables SMTP. `JPA_DDL_AUTO` tiene `update` como valor predeterminado para esta entrega. Las credenciales no se guardan en el repositorio.
 
 ## GitHub y gestión
 
-El workflow `.github/workflows/ci.yml` ejecuta `mvn -B clean verify --file pom.xml` en cada push y pull request, con JDK 25 y caché de Maven. Las pruebas actuales usan H2 aislado; no necesitan un contenedor PostgreSQL en CI. No hay despliegue automático a AWS en el workflow. **Tablero y organización:** `[COMPLETAR: enlace a Projects o herramienta de gestión]`. **Seguimiento:** `[COMPLETAR: enlaces a Issues y responsables]`. **Revisión:** `[COMPLETAR: enlaces a Pull Requests y evidencia de revisión]`. Estos datos deben completarse con enlaces reales del equipo; no se presuponen actividades que no constan aquí.
+El código se organiza en [GitHub](https://github.com/slesgmd/Manka_DBP), con `main` y la rama `feature/rubric-completion`. Los cambios de esta entrega se registraron desde la cuenta `slesgmd`. Los pendientes se siguieron mediante la rama de trabajo y los commits; no se usó un tablero de Projects ni Issues en este hito. GitHub Actions ejecuta `mvn -B clean verify --file pom.xml` en cada push y pull request, con JDK 25. Las pruebas usan H2, por lo que CI no necesita levantar PostgreSQL.
+
+## Apuntes en Obsidian
+
+Ya hay un avance de explicaciones de las partes del proyecto en una bóveda local de Obsidian. Los enlaces entre notas se pueden ver como un grafo y ayudan a entender cómo se conectan las partes del backend. Planeamos subir esa bóveda, o una guía visual equivalente, cuando esté completa; todavía no hay un enlace público.
 
 ## Conclusión
 
-La API convierte la despensa y el tiempo disponible en recomendaciones ordenadas y explicables, además de conservar historial y favoritos. La separación por capas, las validaciones, la seguridad y las pruebas automatizadas sostienen el flujo principal. El aprendizaje central es que un criterio de recomendación útil depende tanto de los datos del usuario como de una explicación transparente del puntaje. Como trabajo futuro quedan pruebas de integración contra PostgreSQL real, migraciones versionadas, medición de rendimiento con un catálogo mayor y una interfaz de usuario conectada al servicio desplegado.
+Con Manka se puede registrar una despensa, buscar platos y recibir recomendaciones que indican por qué un plato aparece antes que otro. También se guardan favoritos e historial. El aprendizaje principal fue separar controladores, servicios y repositorios, validar los datos de entrada y probar la seguridad de las rutas. Como siguientes pasos quedan probar con una base PostgreSQL real en CI, usar migraciones para el esquema, conectar el frontend y preparar un despliegue en AWS.
 
 ## Apéndices
 
 **Licencia:** MIT, 2026, Juan Carlos Sebastian Lescano Garamendi, Luis Eduardo Strater Mc Lellan, Francisco José Lira Francia y Pablo Cesar Vega del Castillo. Véase [LICENSE](LICENSE).
 
-**Referencias:** [Spring Boot](https://docs.spring.io/spring-boot/reference/), [JJWT](https://github.com/jwtk/jjwt/blob/main/README.adoc), [PostgreSQL](https://www.postgresql.org/docs/), [Docker Compose](https://docs.docker.com/compose/gettingstarted/), [Amazon ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-tutorials.html), [Amazon RDS y SSL](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/PostgreSQL.Concepts.General.SSL.html), [Postman Collections](https://learning.postman.com/docs/use/use-collections/overview), material del curso CS 2031 en `docs/Material_pdfs/TEO` y `docs/Material_pdfs/LAB`, y la propuesta y rúbrica locales en `docs/Importante`.
-
-**Campos pendientes:** `[COMPLETAR: URL de AWS]`; `[COMPLETAR: enlace a Projects o herramienta de gestión]`; `[COMPLETAR: enlaces a Issues y responsables]`; `[COMPLETAR: enlaces a Pull Requests y evidencia de revisión]`.
+**Referencias:** materiales de clase de CS 2031; [Spring Boot](https://docs.spring.io/spring-boot/reference/); [PostgreSQL](https://www.postgresql.org/docs/); [Railway](https://docs.railway.com/); [Postman](https://learning.postman.com/docs/use/use-collections/overview).

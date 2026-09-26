@@ -25,6 +25,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -175,6 +178,26 @@ class SecurityIntegrationTests {
                 .subject(email)
                 .claim("email", email)
                 .claim("userId", user.getId())
+                .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)))
+                .compact();
+
+        mockMvc.perform(get("/api/v1/users/me")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsSignedAccessTokenWithWrongRoles() throws Exception {
+        String email = "wrong.roles@manka.test";
+        register("Wrong Roles", email, "SecurePass6")
+                .andExpect(status().isCreated());
+        User user = userRepository.findByEmailIgnoreCase(email).orElseThrow();
+        String token = Jwts.builder()
+                .subject(email)
+                .claim("email", email)
+                .claim("userId", user.getId())
+                .claim("roles", List.of("ADMIN"))
+                .expiration(Date.from(Instant.now().plusSeconds(900)))
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8)))
                 .compact();
 

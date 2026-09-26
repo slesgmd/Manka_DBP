@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Manka Backend — CS 2031",
-    "description": "Colección de la API Manka. Por defecto usa http://localhost:8080. Al desplegar en AWS, sustituya baseUrl por la URL pública del servicio; no se fija aquí una dirección de AWS. Ejecute Register/Login y luego consulte los recursos. Para operaciones de catálogo, inicie sesión con ADMIN o MANAGER. Los IDs iniciales son ejemplos y pueden variar según los datos; actualícelos tras cada POST.",
+    "description": "Colección de la API Manka. Por defecto usa la instancia pública de Railway. Para probar localmente, cambie la variable baseUrl a http://localhost:8080. Ejecute Register/Login y luego consulte los recursos. Para operaciones de catálogo, inicie sesión con ADMIN o MANAGER. Los IDs iniciales son ejemplos y pueden variar según los datos; actualícelos tras cada POST.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -17,7 +17,7 @@
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:8080",
+      "value": "https://mankadbp-production.up.railway.app",
       "type": "string"
     },
     {

@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1350" role="img" aria-labelledby="titulo descripcion">
+  <title id="titulo">Modelo entidad-relación de Manka en notación de Chen</title>
+  <desc id="descripcion">Diez entidades de la API Manka, con sus claves principales en óvalos y doce relaciones en rombos. Los números junto a las conexiones indican cardinalidad.</desc>
+  <style>
+    text { font-family: Arial, sans-serif; fill: #183047; text-anchor: middle; dominant-baseline: middle; }
+    .title { font-size: 31px; font-weight: 700; }
+    .note { font-size: 17px; fill: #4b6073; }
+    .entity { fill: #e8f1fb; stroke: #24537d; stroke-width: 3; }
+    .relation { fill: #e2f5ed; stroke: #277453; stroke-width: 3; }
+    .attribute { fill: #f4eefa; stroke: #795c91; stroke-width: 2; }
+    .edge { fill: none; stroke: #607687; stroke-width: 2.5; }
+    .entity-label { font-size: 16px; font-weight: 700; }
+    .relation-label { font-size: 16px; font-weight: 600; }
+    .attribute-label { font-size: 17px; text-decoration: underline; }
+    .card { font-size: 16px; font-weight: 700; fill: #36536b; }
+  </style>
+  <rect x="0" y="0" width="1600" height="1350" fill="white"/>
+  <text class="title" x="800" y="58">Modelo entidad-relación de Manka</text>
+  <text class="note" x="800" y="98">Notación Chen: rectángulos = entidades · rombos = relaciones · óvalos = atributos · clave subrayada</text>
+
+  <!-- Conexiones entre entidades y relaciones -->
+  <g class="edge">
+    <path d="M290 300 H325 M475 300 H510"/>
+    <path d="M200 328 V433 M200 517 V622"/>
+    <path d="M290 320 L355 455 M505 495 L570 625"/>
+    <path d="M110 300 H65 V825 H125 M200 867 V972"/>
+    <path d="M290 300 H330 V825 H355 M505 825 H600 V972"/>
+    <path d="M690 650 H725 M875 650 H910"/>
+    <path d="M1090 650 H1125 M1275 650 H1310"/>
+    <path d="M1310 650 H1290 V825 H1275 M1125 825 H1000 V972"/>
+    <path d="M690 1000 H725 M875 1000 H910"/>
+    <path d="M1090 1000 H1125 M1275 1000 H1310"/>
+    <path d="M290 1000 H350 V1250 H725 M875 1250 H1100 V1000 H1090"/>
+    <path d="M955 622 V445 H925 M1075 445 H1045 V622"/>
+  </g>
+
+  <!-- Atributos principales: las claves se subrayan -->
+  <g class="edge">
+    <path d="M200 192 V272 M600 192 V272"/>
+    <path d="M200 678 V733 M600 678 V733 M1000 678 V733 M1400 678 V733"/>
+    <path d="M200 1028 V1098 M600 1028 V1098 M1000 1028 V1098 M1400 1028 V1098"/>
+  </g>
+  <g class="attribute">
+    <ellipse cx="200" cy="170" rx="67" ry="23"/><ellipse cx="600" cy="170" rx="67" ry="23"/>
+    <ellipse cx="200" cy="755" rx="67" ry="23"/><ellipse cx="600" cy="755" rx="67" ry="23"/>
+    <ellipse cx="1000" cy="755" rx="67" ry="23"/><ellipse cx="1400" cy="755" rx="67" ry="23"/>
+    <ellipse cx="200" cy="1120" rx="67" ry="23"/><ellipse cx="600" cy="1120" rx="67" ry="23"/>
+    <ellipse cx="1000" cy="1120" rx="67" ry="23"/><ellipse cx="1400" cy="1120" rx="67" ry="23"/>
+  </g>
+  <g class="attribute-label">
+    <text x="200" y="170">id</text><text x="600" y="170">id</text>
+    <text x="200" y="755">id</text><text x="600" y="755">id</text>
+    <text x="1000" y="755">id</text><text x="1400" y="755">id</text>
+    <text x="200" y="1120">id</text><text x="600" y="1120">id</text>
+    <text x="1000" y="1120">id</text><text x="1400" y="1120">id</text>
+  </g>
+
+  <!-- Relaciones (rombos Chen) -->
+  <g class="relation">
+    <polygon points="400,258 475,300 400,342 325,300"/>
+    <polygon points="200,433 275,475 200,517 125,475"/>
+    <polygon points="430,433 505,475 430,517 355,475"/>
+    <polygon points="200,783 275,825 200,867 125,825"/>
+    <polygon points="430,783 505,825 430,867 355,825"/>
+    <polygon points="800,608 875,650 800,692 725,650"/>
+    <polygon points="1200,608 1275,650 1200,692 1125,650"/>
+    <polygon points="1200,783 1275,825 1200,867 1125,825"/>
+    <polygon points="800,958 875,1000 800,1042 725,1000"/>
+    <polygon points="1200,958 1275,1000 1200,1042 1125,1000"/>
+    <polygon points="800,1208 875,1250 800,1292 725,1250"/>
+    <polygon points="1000,403 1075,445 1000,487 925,445"/>
+  </g>
+  <g class="relation-label">
+    <text x="400" y="300">tiene rol</text>
+    <text x="200" y="475">renueva</text>
+    <text x="430" y="475">guarda</text>
+    <text x="200" y="825">marca</text>
+    <text x="430" y="825">cocina</text>
+    <text x="800" y="650">contiene</text>
+    <text x="1200" y="650">integra</text>
+    <text x="1200" y="825">requiere</text>
+    <text x="800" y="1000">registra</text>
+    <text x="1200" y="1000">agrupa</text>
+    <text x="800" y="1250">guarda</text>
+    <text x="1000" y="445">variante de</text>
+  </g>
+
+  <!-- Entidades -->
+  <g class="entity">
+    <rect x="110" y="272" width="180" height="56" rx="2"/>
+    <rect x="510" y="272" width="180" height="56" rx="2"/>
+    <rect x="110" y="622" width="180" height="56" rx="2"/>
+    <rect x="510" y="622" width="180" height="56" rx="2"/>
+    <rect x="910" y="622" width="180" height="56" rx="2"/>
+    <rect x="1310" y="622" width="180" height="56" rx="2"/>
+    <rect x="110" y="972" width="180" height="56" rx="2"/>
+    <rect x="510" y="972" width="180" height="56" rx="2"/>
+    <rect x="910" y="972" width="180" height="56" rx="2"/>
+    <rect x="1310" y="972" width="180" height="56" rx="2"/>
+  </g>
+  <g class="entity-label">
+    <text x="200" y="300">USER</text><text x="600" y="300">ROLE</text>
+    <text x="200" y="650">REFRESH_TOKEN</text><text x="600" y="650">PANTRY_ITEM</text>
+    <text x="1000" y="650">INGREDIENT</text><text x="1400" y="650">DISH_INGREDIENT</text>
+    <text x="200" y="1000">FAVORITE</text><text x="600" y="1000">COOKING_HISTORY</text>
+    <text x="1000" y="1000">DISH</text><text x="1400" y="1000">PROTEIN_CATEGORY</text>
+  </g>
+
+  <!-- Cardinalidades junto a cada entidad -->
+  <g class="card">
+    <text x="305" y="278">N</text><text x="495" y="278">N</text>
+    <text x="180" y="355">1</text><text x="180" y="600">N</text>
+    <text x="302" y="350">1</text><text x="553" y="600">N</text>
+    <text x="82" y="350">1</text><text x="200" y="952">N</text>
+    <text x="345" y="315">1</text><text x="530" y="950">N</text>
+    <text x="700" y="628">N</text><text x="900" y="628">1</text>
+    <text x="1100" y="628">1</text><text x="1300" y="628">N</text>
+    <text x="1300" y="705">N</text><text x="1015" y="950">1</text>
+    <text x="700" y="978">N</text><text x="900" y="978">1</text>
+    <text x="1100" y="978">N</text><text x="1300" y="978">1</text>
+    <text x="330" y="978">N</text><text x="1090" y="1070">1</text>
+    <text x="925" y="535">N</text><text x="1075" y="535">1</text>
+  </g>
+  <text class="note" x="800" y="1324">Se muestran las claves principales; los demás atributos se describen en el README.</text>
+</svg>

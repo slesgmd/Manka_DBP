@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -55,14 +56,25 @@ public class JwtService {
     }
 
     public boolean isValid(String token, UserDetails user) {
+        if (!(user instanceof AuthenticatedUser authenticatedUser)) {
+            return false;
+        }
         Claims claims = parseClaims(token);
         Object userId = claims.get("userId");
         Date expiration = claims.getExpiration();
-        return user instanceof AuthenticatedUser authenticatedUser
-                && userId instanceof Number number
+        Object rolesClaim = claims.get("roles");
+        List<String> userRoles = user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(authority -> authority.substring("ROLE_".length()))
+                .toList();
+        return userId instanceof Number number
                 && number.longValue() == authenticatedUser.id()
                 && user.getUsername().equalsIgnoreCase(claims.getSubject())
                 && user.getUsername().equalsIgnoreCase(claims.get("email", String.class))
+                && rolesClaim instanceof List<?> roles
+                && !userRoles.isEmpty()
+                && roles.size() == userRoles.size()
+                && roles.containsAll(userRoles)
                 && user.isEnabled()
                 && expiration != null
                 && expiration.after(new Date());
