@@ -5,3 +5,10 @@ docs
 README.md
 *.log
 .env
+.contexto
+.claude
+.idea
+web
+tmp
+Doc_oficial
+assets
