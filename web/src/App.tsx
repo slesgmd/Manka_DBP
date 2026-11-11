@@ -1,31 +1,55 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { getStatus } from "./services/statusService";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Layout from "./components/Layout";
+import Loading from "./components/Loading";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
+import { ROUTES } from "./routes";
+
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage"));
+const RecommendationsPage = lazy(() => import("./pages/RecommendationsPage"));
+const CatalogPage = lazy(() => import("./pages/CatalogPage"));
+const DishDetailPage = lazy(() => import("./pages/DishDetailPage"));
+const PantryPage = lazy(() => import("./pages/PantryPage"));
+const FavoritesPage = lazy(() => import("./pages/FavoritesPage"));
+const HistoryPage = lazy(() => import("./pages/HistoryPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
-  const [status, setStatus] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    getStatus(controller.signal)
-      .then(data => setStatus(data.status))
-      .catch(err => {
-        if (!axios.isCancel(err)) setError("No se pudo conectar con la API");
-      });
-    return () => controller.abort();
-  }, []);
-
   return (
-    <main className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
-      <div className="bg-white rounded-xl shadow p-6 text-center">
-        <h1 className="text-2xl font-bold text-slate-800 mb-2">Manka</h1>
-        <p className="text-sm text-slate-500 mb-4">{import.meta.env.VITE_API_URL}</p>
-        {!status && !error && <p className="text-slate-600">Conectando...</p>}
-        {status && <p className="text-green-700 font-semibold">API: {status}</p>}
-        {error && <p className="text-red-600 font-semibold">{error}</p>}
-      </div>
-    </main>
+    <BrowserRouter>
+      <AuthProvider>
+        <Suspense fallback={<Loading />}>
+          <Routes>
+            <Route element={<PublicRoute />}>
+              <Route path={ROUTES.login} element={<LoginPage />} />
+              <Route path={ROUTES.register} element={<RegisterPage />} />
+            </Route>
+
+            <Route element={<PrivateRoute />}>
+              <Route element={<Layout />}>
+                <Route path={ROUTES.home} element={<RecommendationsPage />} />
+                <Route path={ROUTES.catalog} element={<CatalogPage />} />
+                <Route path={ROUTES.dish} element={<DishDetailPage />} />
+                <Route path={ROUTES.pantry} element={<PantryPage />} />
+                <Route path={ROUTES.favorites} element={<FavoritesPage />} />
+                <Route path={ROUTES.history} element={<HistoryPage />} />
+                <Route path={ROUTES.profile} element={<ProfilePage />} />
+                <Route element={<PrivateRoute role="ADMIN" />}>
+                  <Route path={ROUTES.admin} element={<AdminPage />} />
+                </Route>
+              </Route>
+            </Route>
+
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
