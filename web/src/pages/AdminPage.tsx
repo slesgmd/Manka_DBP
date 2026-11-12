@@ -21,14 +21,14 @@ const SUBTITLES: Record<Section, string> = {
 
 export default function AdminPage() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const param = searchParams.get("seccion");
+  const param = searchParams.get("tab");
   const section: Section = SECTIONS.some(s => s.value === param) ? (param as Section) : "usuarios";
 
   return (
     <>
       <PageHeader title="Administración" subtitle={SUBTITLES[section]}>
         <div className="w-full sm:w-[420px]">
-          <SegmentedControl label="Sección de administración" options={SECTIONS} value={section} onChange={value => setSearchParams({ seccion: value })} />
+          <SegmentedControl label="Sección de administración" options={SECTIONS} value={section} onChange={value => setSearchParams({ tab: value })} />
         </div>
       </PageHeader>
       {section === "usuarios" && <UsersSection />}

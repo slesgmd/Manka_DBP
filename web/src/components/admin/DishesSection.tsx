@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
-import { useDebounce } from "../../hooks/useDebounce";
+import { useCallback, useEffect, useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
+import { usePagination } from "../../hooks/usePagination";
 import { useToast } from "../../hooks/useToast";
 import { deleteDish, getDishes } from "../../services/dishService";
 import { getProteinCategories } from "../../services/proteinCategoryService";
@@ -11,6 +11,7 @@ import ConfirmDialog from "../ui/ConfirmDialog";
 import DishImage from "../ui/DishImage";
 import ErrorState from "../ui/ErrorState";
 import Icon from "../ui/Icon";
+import Pagination from "../ui/Pagination";
 import SearchField from "../ui/SearchField";
 import SkeletonBlock from "../ui/SkeletonBlock";
 import DishForm from "./DishForm";
@@ -21,14 +22,17 @@ const iconButton = "glass glass-thin press flex size-11 items-center justify-cen
 
 export default function DishesSection() {
   const { showToast } = useToast();
-  const [query, setQuery] = useState("");
+  const { page, size, search: name, query, setQuery, setPage, setSize, fitTo } = usePagination();
   const [editing, setEditing] = useState<Editing>(null);
   const [toDelete, setToDelete] = useState<Dish | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const name = useDebounce(query.trim(), 400);
 
-  const fetchDishes = useCallback((signal: AbortSignal) => getDishes({ name: name || undefined, size: 100, sort: "name,asc" }, signal), [name]);
+  const fetchDishes = useCallback((signal: AbortSignal) => getDishes({ name: name || undefined, page, size, sort: "name,asc" }, signal), [name, page, size]);
   const { data, loading, error, retry } = useFetch(fetchDishes);
+
+  useEffect(() => {
+    if (data && !loading) fitTo(data.totalPages);
+  }, [data, loading, fitTo]);
   const proteins = useFetch(getProteinCategories);
 
   const closeForm = useCallback(() => {
@@ -121,6 +125,19 @@ export default function DishesSection() {
           </div>
         )}
       </section>
+
+      {data && data.content.length > 0 && (
+        <Pagination
+          page={page}
+          size={size}
+          totalElements={data.totalElements}
+          totalPages={data.totalPages}
+          shown={data.content.length}
+          sizeLabel="Platos por página"
+          onPageChange={setPage}
+          onSizeChange={setSize}
+        />
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}

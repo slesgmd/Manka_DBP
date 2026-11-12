@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
-import { useDebounce } from "../../hooks/useDebounce";
+import { useCallback, useEffect, useState } from "react";
 import { useFetch } from "../../hooks/useFetch";
+import { usePagination } from "../../hooks/usePagination";
 import { useToast } from "../../hooks/useToast";
 import { deleteIngredient, getIngredients } from "../../services/ingredientService";
 import type { Ingredient } from "../../types/catalog";
@@ -9,6 +9,7 @@ import Button from "../ui/Button";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import ErrorState from "../ui/ErrorState";
 import Icon from "../ui/Icon";
+import Pagination from "../ui/Pagination";
 import SearchField from "../ui/SearchField";
 import SkeletonBlock from "../ui/SkeletonBlock";
 import IngredientForm from "./IngredientForm";
@@ -19,14 +20,17 @@ const iconButton = "glass glass-thin press flex size-11 items-center justify-cen
 
 export default function IngredientsSection() {
   const { showToast } = useToast();
-  const [query, setQuery] = useState("");
+  const { page, size, search: name, query, setQuery, setPage, setSize, fitTo } = usePagination();
   const [editing, setEditing] = useState<Editing>(null);
   const [toDelete, setToDelete] = useState<Ingredient | null>(null);
   const [deleting, setDeleting] = useState(false);
-  const name = useDebounce(query.trim(), 400);
 
-  const fetchIngredients = useCallback((signal: AbortSignal) => getIngredients({ name: name || undefined, size: 100, sort: "name,asc" }, signal), [name]);
+  const fetchIngredients = useCallback((signal: AbortSignal) => getIngredients({ name: name || undefined, page, size, sort: "name,asc" }, signal), [name, page, size]);
   const { data, loading, error, retry } = useFetch(fetchIngredients);
+
+  useEffect(() => {
+    if (data && !loading) fitTo(data.totalPages);
+  }, [data, loading, fitTo]);
 
   const closeForm = useCallback((saved: boolean) => {
     setEditing(null);
@@ -108,12 +112,20 @@ export default function IngredientsSection() {
             </table>
           </div>
         )}
-        {data && data.totalElements > data.numberOfElements && (
-          <p className="border-t border-sep px-4 pt-3.5 text-footnote text-ink-2">
-            Mostrando {data.numberOfElements} de {data.totalElements}. Usa la búsqueda para encontrar el resto.
-          </p>
-        )}
       </section>
+
+      {data && data.content.length > 0 && (
+        <Pagination
+          page={page}
+          size={size}
+          totalElements={data.totalElements}
+          totalPages={data.totalPages}
+          shown={data.content.length}
+          sizeLabel="Ingredientes por página"
+          onPageChange={setPage}
+          onSizeChange={setSize}
+        />
+      )}
 
       <ConfirmDialog
         open={toDelete !== null}
