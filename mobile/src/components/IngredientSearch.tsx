@@ -14,9 +14,10 @@ interface IngredientSearchProps {
   addedIds: Set<number>;
   onAdd: (ingredient: Ingredient) => Promise<void>;
   initialQuery?: string;
+  suggestions?: Ingredient[];
 }
 
-export default function IngredientSearch({ addedIds, onAdd, initialQuery = "" }: IngredientSearchProps) {
+export default function IngredientSearch({ addedIds, onAdd, initialQuery = "", suggestions = [] }: IngredientSearchProps) {
   const [query, setQuery] = useState(initialQuery);
   const [busyId, setBusyId] = useState<number | null>(null);
   const name = useDebounce(query.trim(), 350);
@@ -26,6 +27,8 @@ export default function IngredientSearch({ addedIds, onAdd, initialQuery = "" }:
     [name],
   );
   const { data, loading, error, retry } = useFetch(fetchIngredients);
+
+  const results = name ? data : suggestions;
 
   const handleAdd = async (ingredient: Ingredient) => {
     setBusyId(ingredient.id);
@@ -39,24 +42,24 @@ export default function IngredientSearch({ addedIds, onAdd, initialQuery = "" }:
   return (
     <View style={styles.container}>
       <SearchField label="Buscar ingrediente para tu despensa" placeholder="Buscar ingrediente" value={query} onChangeText={setQuery} />
-      {name !== "" && (
+      {(name !== "" || suggestions.length > 0) && (
         <GlassView variant="dense" radius={radius.card} style={styles.results}>
-          {loading && (
+          {name !== "" && loading && (
             <View style={styles.message}>
               <ActivityIndicator color={colors.ink} />
               <Text style={text.subhead}>Buscando…</Text>
             </View>
           )}
-          {!loading && error && (
+          {name !== "" && !loading && error && (
             <View style={styles.message}>
               <Text style={[text.subhead, styles.flex]}>No pudimos buscar ingredientes.</Text>
               <Button label="Reintentar" onPress={retry} />
             </View>
           )}
-          {!loading && !error && data?.length === 0 && (
+          {name !== "" && !loading && !error && data?.length === 0 && (
             <Text style={[text.subhead, styles.message]}>Ningún ingrediente coincide con «{name}».</Text>
           )}
-          {!loading && !error && data?.map(ingredient => (
+          {!loading && !error && results?.map(ingredient => (
             <View key={ingredient.id} style={styles.row}>
               <Text style={styles.name}>{ingredient.name}</Text>
               {addedIds.has(ingredient.id) ? (

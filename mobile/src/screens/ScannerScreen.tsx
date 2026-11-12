@@ -10,7 +10,7 @@ import IngredientSearch from "../components/IngredientSearch";
 import ScreenBackground from "../components/ScreenBackground";
 import TextField from "../components/TextField";
 import { usePantry } from "../hooks/usePantry";
-import { findIngredientTerm, getProductName, productErrorMessage } from "../services/openFoodFactsService";
+import { findIngredientMatches, getProductName, productErrorMessage } from "../services/openFoodFactsService";
 import type { Ingredient } from "../types/catalog";
 import { errorMessage } from "../utils/http";
 import { colors, radius, text } from "../utils/theme";
@@ -19,7 +19,7 @@ type ScanState =
   | { status: "idle" }
   | { status: "loading"; code: string }
   | { status: "error"; code: string; message: string }
-  | { status: "done"; code: string; productName: string; term: string | null };
+  | { status: "done"; code: string; productName: string; matches: Ingredient[] };
 
 const validateCode = (code: string) => (/^\d{8,14}$/.test(code) ? undefined : "El código tiene entre 8 y 14 números.");
 
@@ -45,8 +45,8 @@ export default function ScannerScreen() {
       return;
     }
     try {
-      const term = await findIngredientTerm(productName);
-      setScan({ status: "done", code: value, productName, term });
+      const matches = await findIngredientMatches(productName);
+      setScan({ status: "done", code: value, productName, matches });
     } catch (err) {
       setScan({ status: "error", code: value, message: errorMessage(err, `Encontramos «${productName}», pero no pudimos buscarlo.`) });
     }
@@ -153,9 +153,15 @@ export default function ScannerScreen() {
         <Text style={text.footnote}>Código {scan.code}</Text>
         <Text style={text.title3}>{scan.productName}</Text>
         <Text style={text.subhead}>
-          {scan.term ? "Estos ingredientes coinciden. Agrega el que corresponda:" : "No hay un ingrediente con ese nombre. Búscalo a mano:"}
+          {scan.matches.length > 0 ? "Estos ingredientes coinciden. Agrega el que corresponda:" : "No hay un ingrediente con ese nombre. Búscalo a mano:"}
         </Text>
-        <IngredientSearch key={scan.code} addedIds={pantry.ids} onAdd={handleAdd} initialQuery={scan.term ?? scan.productName} />
+        <IngredientSearch
+          key={scan.code}
+          addedIds={pantry.ids}
+          onAdd={handleAdd}
+          suggestions={scan.matches}
+          initialQuery={scan.matches.length > 0 ? "" : scan.productName}
+        />
         <Button label="Escanear otro" icon="barcode-outline" onPress={scanAgain} />
       </GlassView>
     );

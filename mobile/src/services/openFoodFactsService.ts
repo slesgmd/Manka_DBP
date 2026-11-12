@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { Ingredient } from "../types/catalog";
 import { getIngredients } from "./ingredientService";
 
 const openFoodFacts = axios.create({
@@ -40,11 +41,13 @@ export function productErrorMessage(err: unknown) {
   return "Open Food Facts no responde ahora. Inténtalo en un momento.";
 }
 
-export async function findIngredientTerm(productName: string) {
-  const words = productName.split(/[^\p{L}]+/u).filter(word => word.length >= 3).sort((a, b) => b.length - a.length);
-  for (const term of [productName, ...words]) {
-    const page = await getIngredients({ name: term, size: 1 });
-    if (page.content.length > 0) return term;
-  }
-  return null;
+const withoutAccents = (word: string) => word.normalize("NFD").replace(/\p{M}/gu, "");
+
+export async function findIngredientMatches(productName: string) {
+  const words = productName.split(/[^\p{L}]+/u).filter(word => word.length >= 3);
+  const terms = new Set([productName, ...words, ...words.map(withoutAccents)].map(term => term.toLowerCase()));
+  const pages = await Promise.all([...terms].map(term => getIngredients({ name: term, size: 5 })));
+  const matches = new Map<number, Ingredient>();
+  pages.forEach(page => page.content.forEach(ingredient => matches.set(ingredient.id, ingredient)));
+  return [...matches.values()];
 }
