@@ -16,6 +16,7 @@ import SegmentedControl from "../components/SegmentedControl";
 import { useFetch } from "../hooks/useFetch";
 import { usePantry } from "../hooks/usePantry";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
+import { useShake } from "../hooks/useShake";
 import { getIngredients } from "../services/ingredientService";
 import { removePantryItem } from "../services/pantryService";
 import { getRecommendations } from "../services/recommendationService";
@@ -63,6 +64,16 @@ export default function HomeScreen() {
       navigation.navigate("DishDetail", { dishId: recommendation.dishId, name: recommendation.name, recommendation }),
     [navigation],
   );
+
+  const surprise = useCallback(() => {
+    if (!results || results.length === 0) {
+      Alert.alert("Sorpréndeme", "Primero agrega ingredientes y busca qué puedes cocinar.");
+      return;
+    }
+    openDish(results[Math.floor(Math.random() * results.length)]);
+  }, [results, openDish]);
+
+  const shakeAvailable = useShake(surprise);
 
   const handleAdd = useCallback((ingredient: Ingredient) => addToPantry(ingredient.id, ingredient.name), [addToPantry]);
 
@@ -206,6 +217,13 @@ export default function HomeScreen() {
             loadingLabel="Buscando…"
             onPress={search}
           />
+          <Button
+            label="Sorpréndeme"
+            icon="shuffle"
+            disabled={recommendations.loading || !results || results.length === 0}
+            onPress={surprise}
+          />
+          {shakeAvailable && <Text style={[text.footnote, styles.center]}>O agita tu celular para un plato al azar entre los 10 mejores.</Text>}
         </GlassView>
 
         {renderResults()}
