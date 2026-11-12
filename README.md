@@ -1,95 +1,99 @@
-# Manka: backend para decidir qué cocinar
+# Manka: qué cocinar con lo que tienes
 
-**Curso:** CS 2031 Desarrollo Basado en Plataforma  
-**Integrantes:** Juan Carlos Sebastian Lescano Garamendi; Luis Eduardo Strater Mc Lellan; Francisco José Lira Francia; Pablo Cesar Vega del Castillo.  
-**Entrega:** Proyecto 1, septiembre de 2026.
+**Curso:** CS 2031 Desarrollo Basado en Plataformas  
+**Proyecto 2:** backend, web, móvil y despliegue. Entrega: 14 de noviembre de 2026.  
+**Autor:** Sebastián Lescano.
 
 ## Índice
 
-1. [Introducción](#introducción)
-2. [Identificación del problema](#identificación-del-problema)
-3. [Descripción de la solución](#descripción-de-la-solución)
-4. [Modelo de entidades](#modelo-de-entidades)
-5. [Manejo de errores](#manejo-de-errores)
-6. [Medidas de seguridad](#medidas-de-seguridad)
-7. [Eventos y asincronía](#eventos-y-asincronía)
-8. [Endpoints](#endpoints)
-9. [Arquitectura](#arquitectura)
-10. [Instalación y ejecución local](#instalación-y-ejecución-local)
-11. [Despliegue](#despliegue)
-12. [GitHub y gestión](#github-y-gestión)
-13. [Apuntes en Obsidian](#apuntes-en-obsidian)
-14. [Conclusión](#conclusión)
-15. [Apéndices](#apéndices)
+1. [Qué es Manka](#qué-es-manka)
+2. [Funciones](#funciones)
+3. [Enlaces públicos](#enlaces-públicos)
+4. [Stack](#stack)
+5. [Arquitectura](#arquitectura)
+6. [Ejecución local](#ejecución-local)
+7. [Estructura de carpetas](#estructura-de-carpetas)
+8. [Backend](#backend)
+9. [Despliegue](#despliegue)
+10. [Participación](#participación)
+11. [Apéndices](#apéndices)
 
-## Introducción
+## Qué es Manka
 
-Manka es una API para ayudar a decidir qué cocinar con los ingredientes que hay en casa y el tiempo disponible. El usuario guarda su despensa, consulta platos y recibe una lista ordenada de recomendaciones. En este repositorio está el backend del proyecto; la colección de Postman permite probarlo sin tener un frontend.
+Muchas veces hay ingredientes en casa, pero no está claro qué plato preparar con ellos. Buscar recetas una por una toma
+tiempo y suele terminar en opciones para las que faltan cosas o que tardan más de lo que se tiene. Además, repetir siempre
+el mismo plato aburre.
 
-## Identificación del problema
+Manka recomienda platos peruanos según la despensa del usuario y los minutos que tiene. Cada plato recibe un puntaje de 0
+a 100 que combina cinco criterios: ingredientes disponibles (35 %), tiempo (20 %), variedad de proteína (10 %), repetición
+reciente (20 %) y popularidad (15 %). La respuesta explica cada criterio y muestra los ingredientes que faltan.
 
-Muchas veces hay ingredientes en casa, pero no está claro qué plato preparar con ellos. Buscar recetas una por una toma tiempo y puede terminar en opciones para las que faltan ingredientes. Además, repetir siempre el mismo plato no resulta muy útil. La idea fue empezar con platos peruanos y ordenar las opciones según lo que cada usuario tiene, cuánto tarda la preparación y lo que cocinó antes.
+## Funciones
 
-## Descripción de la solución
+**Web (React)**
 
-Después de registrarse, el usuario añade ingredientes a su despensa e indica cuántos minutos tiene. El sistema puntúa cada plato según cinco criterios: ingredientes disponibles (35 %), tiempo (20 %), variedad de proteína (10 %), repetición reciente (20 %) y popularidad (15 %). Los pesos se pueden cambiar por variables de entorno, siempre que sumen 100 %. La respuesta muestra el puntaje y los ingredientes que faltan. Un plato sin ingredientes registrados no aparece como recomendación.
+- Registro e inicio de sesión con validación en tiempo real; la sesión se renueva sola con el refresh token.
+- Recomendaciones según el tiempo elegido, con la mejor opción, su desglose de puntaje y otras opciones.
+- Despensa con búsqueda de ingredientes (debounce), agregar y quitar con confirmación.
+- Catálogo de platos con búsqueda, filtros y paginación (10/25/50/100 por página, estado en la URL).
+- Detalle de plato: ingredientes que tienes y que faltan, favorito y «marcar como cocinado».
+- Favoritos, historial y perfil.
+- Panel de administración (ADMIN y MANAGER): CRUD de platos, ingredientes y sus relaciones; cambio de roles (ADMIN).
+- Rutas protegidas, carga diferida de páginas, breadcrumbs, página 404, modo oscuro, toasts y aviso sin conexión.
 
-La API también permite buscar platos por nombre, tiempo y categoría; buscar ingredientes; guardar favoritos; y registrar el historial de cocina. Las listas de platos e ingredientes tienen paginación. Los usuarios con rol `ADMIN` o `MANAGER` pueden administrar el catálogo. El proyecto incluye un catálogo inicial de platos peruanos para probar las recomendaciones.
+**Móvil (React Native con Expo)**
 
-Usamos Java 25, Spring Boot 3.5.4, Spring Web, Spring Data JPA, Spring Security y PostgreSQL. Las pruebas usan H2; Maven, Docker y Postman sirven para ejecutar y revisar el proyecto. Springdoc genera la documentación OpenAPI y la interfaz Swagger UI. Las contraseñas se guardan con BCrypt y los JWT se generan con JJWT. Esta entrega se centra en el backend hecho en Spring Boot con PostgreSQL en Railway.
+- Inicio de sesión y registro; tokens guardados en SecureStore.
+- Recomendaciones, catálogo, detalle, despensa, favoritos, historial y perfil.
+- **Cámara:** escanear el código de barras de un producto, buscarlo en Open Food Facts y agregar a la despensa los
+  ingredientes que coinciden. Si no hay permiso o cámara, se escribe el código o se busca a mano.
+- **Acelerómetro:** agitar el teléfono (o pulsar «Sorpréndeme») abre una recomendación al azar.
+- Skeletons, reintentos, mensajes de error amigables, aviso sin conexión y toasts con «Deshacer».
 
-## Modelo de entidades
+## Enlaces públicos
 
-![Modelo entidad-relación de Manka en notación de Chen](assets/modelo-chen.svg)
-
-[Abrir el diagrama Chen a tamaño completo](assets/modelo-chen.svg). Los rectángulos representan entidades, los rombos relaciones y los óvalos atributos; la clave principal de cada entidad está subrayada. Los números `1` y `N` indican la cardinalidad. Se muestran las claves principales para que el dibujo siga siendo legible.
-
-| Entidad | Atributos principales |
+| Componente | Enlace |
 | --- | --- |
-| `User` | `id`, `name`, `email`, `passwordHash`, `enabled`, `createdAt` |
-| `Role` | `id`, `name` |
-| `RefreshToken` | `id`, `tokenHash`, `expiresAt`, `revoked`, `createdAt` |
-| `Ingredient` | `id`, `name`, `parentIngredient` |
-| `Dish` | `id`, `name`, `totalTimeMinutes`, `proteinCategory` |
-| `ProteinCategory` | `id`, `name` |
-| `DishIngredient` | `id`, `dish`, `ingredient` |
-| `PantryItem` | `id`, `user`, `ingredient`, `addedAt` |
-| `Favorite` | `id`, `user`, `dish`, `createdAt` |
-| `CookingHistory` | `id`, `user`, `dish`, `cookedAt` |
+| Web (Vercel) | https://manka-dbp.vercel.app |
+| API (AWS, CloudFront) | https://d2bql0rp3k9uia.cloudfront.net/api/v1 |
+| Swagger UI | https://d2bql0rp3k9uia.cloudfront.net/swagger-ui.html |
+| OpenAPI (JSON) | https://d2bql0rp3k9uia.cloudfront.net/v3/api-docs |
+| Salud | https://d2bql0rp3k9uia.cloudfront.net/actuator/health |
+| Móvil, EAS Update para Expo Go (Android) | https://expo.dev/accounts/seblescano/projects/manka/updates/67f14ec6-0469-4bd7-8adf-d6dc2bdf50ba |
+| Móvil, APK de Android | https://expo.dev/accounts/seblescano/projects/manka/builds/752ddd7e-e9b5-4db2-b45d-afe5a26e0c72 |
+| Repositorio | https://github.com/slesgmd/Manka_DBP |
 
-`Dish` guarda nombre y tiempo de preparación; `Ingredient` guarda nombre y puede apuntar a otro ingrediente para representar variantes, como pechuga de pollo y pollo. `DishIngredient` une platos con ingredientes y evita relaciones duplicadas. `ProteinCategory` agrupa platos. `PantryItem`, `Favorite` y `CookingHistory` guardan información propia de cada usuario, incluida la fecha de la acción. `User` tiene nombre, correo, contraseña codificada y roles; `RefreshToken` guarda vencimiento y revocación de la sesión. Las relaciones usan claves foráneas y restricciones de unicidad. Para las respuestas HTTP usamos DTOs y no exponemos las entidades directamente.
+**Usuario de demo (rol USER):** `prueba.rutas.1111@manka.pe` / `Prueba1234`.
 
-## Manejo de errores
+Para abrir la app en Expo Go: instalar Expo Go en Android, abrir el enlace del update y escanear el código QR «Preview».
+El APK se instala directamente desde su página de build.
 
-El proyecto usa `GlobalExceptionHandler` para que los errores tengan el mismo formato: fecha, código, tipo, mensaje y ruta. Devuelve 400 si los datos son inválidos, 401 si falla la autenticación, 403 si faltan permisos, 404 si no existe el recurso y 409 si hay un duplicado o una restricción de datos. Los errores inesperados reciben 500 sin mostrar detalles internos. También validamos los DTOs con `@Valid` y anotaciones como `@NotBlank`, `@Email` y `@Positive`.
+## Stack
 
-## Medidas de seguridad
-
-Al registrarse, una cuenta recibe el rol `USER`. `MANAGER` y `ADMIN` pueden editar el catálogo; solo `ADMIN` puede cambiar roles. Spring Security verifica los JWT y los permisos de cada operación. Los access tokens duran poco y los refresh tokens se pueden revocar. El secreto JWT y las contraseñas de la base se configuran fuera del repositorio. CORS acepta los orígenes configurados. La API usa Bearer tokens, por eso no mantiene sesiones HTTP ni usa cookies para autenticar. Las consultas con JPA y los DTOs ayudan a evitar inyección SQL y exposición de contraseñas; el frontend deberá escapar el texto que muestre para evitar XSS.
-
-## Eventos y asincronía
-
-Se publican eventos cuando alguien se registra, cocina un plato o agrega un favorito. Los listeners se ejecutan después de guardar la operación en la base, para no procesar eventos de cambios que fallaron. El correo de bienvenida, la confirmación de cocina y el registro de actividad se ejecutan con `@Async`. Así la respuesta de la API no espera al correo. Si el envío falla, se registra el error. El correo está desactivado por defecto y requiere configurar SMTP para usarlo.
-
-## Endpoints
-
-La colección [postman_collection.json](postman_collection.json) incluye las solicitudes, ejemplos de respuesta y una breve descripción de cada ruta. La variable `{{baseUrl}}` usa Railway; para probar localmente se cambia a `http://localhost:8080`. La colección usa `{{accessToken}}` para las rutas protegidas. Registro, login, renovación de token y salud son públicos. Todas las rutas de la API empiezan con `/api/v1`, salvo Actuator.
-
-La documentación generada se puede consultar en [Swagger UI](https://mankadbp-production.up.railway.app/swagger-ui.html) y el contrato OpenAPI en formato JSON está en [`/v3/api-docs`](https://mankadbp-production.up.railway.app/v3/api-docs).
-
-| Recurso | Rutas y métodos | Acceso principal |
-| --- | --- | --- |
-| Auth | `POST /auth/register`, `/login`, `/refresh`, `/logout` | Público |
-| Users | `GET /users/me`, `GET /users`, `PATCH /users/{id}/roles` | Usuario / ADMIN |
-| Dishes | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
-| Ingredients | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
-| Protein Categories | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
-| Dish Ingredients | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
-| Pantry, Favorites, Cooking History | `GET`, `POST`, `DELETE /{id}` | Usuario autenticado |
-| Recommendations | `GET /recommendations?availableMinutes=45&limit=10` | Usuario autenticado |
-| Status / Health | `GET /status`, `GET /actuator/health` | Público |
+| Capa | Tecnologías |
+| --- | --- |
+| Backend | Java 25, Spring Boot 3.5.4 (Web, Data JPA, Security, Validation), JJWT, springdoc-openapi, PostgreSQL 16, Maven |
+| Web | Vite, React 19, TypeScript, Tailwind CSS 4, React Router 7, axios |
+| Móvil | Expo SDK 58, React Native 0.88, TypeScript, React Navigation 7, axios, expo-secure-store, expo-camera, expo-sensors, NetInfo |
+| API externa | Open Food Facts (datos de productos por código de barras) |
+| Despliegue | AWS (EC2 con Docker, RDS PostgreSQL, ECR, CloudFront), Vercel, EAS Update y EAS Build |
+| CI | GitHub Actions (`mvn -B clean verify`) |
 
 ## Arquitectura
+
+```mermaid
+flowchart LR
+    U1[Navegador] -->|HTTPS| V[Vercel<br/>web React]
+    U2[Android<br/>Expo Go o APK] -->|descarga el bundle| E[EAS Update / EAS Build]
+    V -->|HTTPS + JWT| CF[CloudFront<br/>HTTPS]
+    U2 -->|HTTPS + JWT| CF
+    U2 -->|código de barras| OFF[Open Food Facts]
+    CF -->|HTTP 8080| EC2[EC2 t3.micro<br/>Docker: Spring Boot]
+    ECR[ECR<br/>imagen Docker] -->|docker pull| EC2
+    EC2 -->|JDBC 5432| RDS[(RDS<br/>PostgreSQL 16)]
+```
+
+Dentro del backend:
 
 ```mermaid
 flowchart LR
@@ -106,48 +110,178 @@ flowchart LR
     AsyncExecutor --> Email
 ```
 
-Los controladores reciben las peticiones y validan sus datos. Los servicios contienen las reglas del proyecto y llaman a los repositorios para consultar PostgreSQL. Los mappers preparan las respuestas de la API. La recomendación está separada en criterios pequeños para poder probar cada puntaje. Los eventos dejan el correo y el registro de actividad fuera del flujo principal.
+Los controladores reciben las peticiones y validan los datos. Los servicios tienen las reglas del proyecto y usan los
+repositorios para consultar PostgreSQL. La recomendación está separada en criterios pequeños (un `RecommendationScorer`
+por criterio) para poder probar cada puntaje. La web y el móvil tienen la misma separación: `services/` (axios con
+baseURL e interceptores), `hooks/` y `contexts/` (lógica y estado global) y `components/` y `pages/`/`screens/` (UI).
 
-## Instalación y ejecución local
+## Ejecución local
 
-Para ejecutar con contenedores se necesita Docker Compose. Copie `.env.example` a `.env` y cambie `DB_PASSWORD` y `JWT_SECRET` por valores propios. El secreto JWT debe tener al menos 32 bytes. `.env` está excluido de Git. Luego ejecute:
+### Backend
+
+Se necesita Docker Compose. Copiar `.env.example` a `.env` y cambiar `DB_PASSWORD` y `JWT_SECRET` (mínimo 32 bytes).
+Para usar la web local, `CORS_ALLOWED_ORIGINS` debe incluir `http://localhost:5173`.
 
 ```sh
 docker compose up --build -d
 docker compose ps
 ```
 
-Abra `http://localhost:8080/actuator/health` para comprobar que arrancó. También puede importar Postman y cambiar `baseUrl` a esa dirección. Los IDs de la colección son ejemplos; se deben reemplazar por los que devuelva cada `POST`.
-
-Para ejecutar la aplicación fuera de Docker se necesita JDK 25. Levante PostgreSQL con `docker compose up -d db`, configure las variables de `.env` en la terminal o el IDE y cambie `DB_URL` a `jdbc:postgresql://localhost:5432/manka`. Después use el Maven Wrapper incluido:
+Comprobar en `http://localhost:8080/actuator/health`. Sin Docker para la app se necesita JDK 25: levantar solo la base con
+`docker compose up -d db`, poner las variables de `.env` en la terminal o el IDE con
+`DB_URL=jdbc:postgresql://localhost:5432/manka` y ejecutar:
 
 ```sh
 ./mvnw spring-boot:run
 ./mvnw clean verify
 ```
 
-En Windows se usa `mvnw.cmd` en lugar de `./mvnw`. Spring Boot no lee `.env` automáticamente si se ejecuta con Maven. Al iniciar, la aplicación crea los roles y, si el catálogo está vacío, carga platos e ingredientes de ejemplo. `MANKA_SEED_ENABLED` permite desactivar esa carga. Para crear una cuenta administradora en el primer arranque se pueden definir `ADMIN_EMAIL` y `ADMIN_PASSWORD`.
+En Windows se usa `mvnw.cmd`. Al iniciar se crean los roles y, si el catálogo está vacío, platos e ingredientes de ejemplo
+(`MANKA_SEED_ENABLED`). `ADMIN_EMAIL` y `ADMIN_PASSWORD` crean una cuenta administradora en el primer arranque.
+
+| Variable | Uso |
+| --- | --- |
+| `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` | Conexión a PostgreSQL |
+| `JWT_SECRET` | Firma de los access tokens |
+| `CORS_ALLOWED_ORIGINS` | Orígenes web permitidos, separados por coma |
+| `MAIL_*` | Correo (desactivado por defecto) |
+| `ADMIN_EMAIL`, `ADMIN_PASSWORD` | Administrador inicial (opcional) |
+| `RECOMMENDATION_WEIGHT_*` | Pesos de los criterios (deben sumar 1) |
+
+### Web
+
+```sh
+cd web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+`VITE_API_URL` es la URL del backend sin `/api/v1` (`http://localhost:8080` en local). La app queda en
+`http://localhost:5173`. `npm run build` genera la versión de producción y `npm run lint` revisa el código.
+
+### Móvil
+
+```sh
+cd mobile
+cp .env.example .env
+npm install
+npx expo start
+```
+
+`EXPO_PUBLIC_API_URL` es la URL del backend sin `/api/v1`. Desde el teléfono `localhost` no funciona: usar la API
+pública o la IP de la computadora en la red. Abrir el QR con Expo Go; si el teléfono está en otra red, usar
+`npx expo start --tunnel`.
+
+## Estructura de carpetas
+
+```text
+.
+├── src/main/java/com/manka/backend/   Backend Spring Boot
+│   ├── config/          Seguridad, CORS, OpenAPI, datos iniciales, pesos
+│   ├── controller/      Endpoints REST
+│   ├── dto/  mapper/    Entrada y salida de la API
+│   ├── service/  repository/  model/
+│   ├── recommendation/  Motor y criterios de puntaje
+│   ├── security/        JWT y filtros
+│   └── event/  exception/
+├── src/test/            Pruebas (H2)
+├── web/src/
+│   ├── services/        axios (api.ts) y un servicio por recurso
+│   ├── context/         AuthContext y ToastContext
+│   ├── hooks/           useAuth, useFetch, useForm, usePagination, ...
+│   ├── components/      Componentes reutilizables (ui/, admin/)
+│   ├── pages/           Vistas
+│   └── routes.ts        Rutas centralizadas
+├── mobile/src/
+│   ├── services/        axios, SecureStore, Open Food Facts
+│   ├── contexts/  hooks/  components/  screens/  navigation/  utils/  types/
+├── Dockerfile  docker-compose.yml  postman_collection.json
+└── .github/workflows/   CI con Maven
+```
+
+## Backend
+
+### Modelo de entidades
+
+![Modelo entidad-relación de Manka en notación de Chen](assets/modelo-chen.svg)
+
+[Abrir el diagrama Chen a tamaño completo](assets/modelo-chen.svg). Los rectángulos son entidades, los rombos relaciones y
+los óvalos atributos; la clave principal está subrayada.
+
+| Entidad | Atributos principales |
+| --- | --- |
+| `User` | `id`, `name`, `email`, `passwordHash`, `enabled`, `createdAt` |
+| `Role` | `id`, `name` |
+| `RefreshToken` | `id`, `tokenHash`, `expiresAt`, `revoked`, `createdAt` |
+| `Ingredient` | `id`, `name`, `parentIngredient` |
+| `Dish` | `id`, `name`, `totalTimeMinutes`, `proteinCategory` |
+| `ProteinCategory` | `id`, `name` |
+| `DishIngredient` | `id`, `dish`, `ingredient` |
+| `PantryItem` | `id`, `user`, `ingredient`, `addedAt` |
+| `Favorite` | `id`, `user`, `dish`, `createdAt` |
+| `CookingHistory` | `id`, `user`, `dish`, `cookedAt` |
+
+`Ingredient` puede apuntar a otro ingrediente para representar variantes (pechuga de pollo y pollo). `DishIngredient` une
+platos con ingredientes sin duplicados. `PantryItem`, `Favorite` y `CookingHistory` guardan datos de cada usuario. Las
+respuestas usan DTOs; las entidades no se exponen.
+
+### Manejo de errores
+
+`GlobalExceptionHandler` da a todos los errores el mismo formato: fecha, código, tipo, mensaje y ruta. 400 datos inválidos,
+401 autenticación fallida, 403 sin permisos, 404 recurso inexistente, 409 duplicado o restricción, 500 sin detalles
+internos. Los DTOs se validan con `@Valid`, `@NotBlank`, `@Email`, `@Positive`, etc.
+
+### Seguridad
+
+El registro asigna el rol `USER`. `MANAGER` y `ADMIN` editan el catálogo; solo `ADMIN` cambia roles. El access token es un
+JWT de 15 minutos y el refresh token es una cadena aleatoria de 7 días guardada con hash, que se rota en cada uso y se
+revoca al cerrar sesión. Las contraseñas usan BCrypt. Los secretos están fuera del repositorio. CORS solo acepta los
+orígenes configurados; la API no usa sesiones ni cookies.
+
+### Eventos y asincronía
+
+Registrarse, cocinar un plato o agregar un favorito publica un evento. Los listeners corren después de confirmar la
+transacción y con `@Async`, así la respuesta no espera al correo. El correo está desactivado por defecto.
+
+### Endpoints
+
+Todas las rutas empiezan con `/api/v1`, salvo Actuator. La colección [postman_collection.json](postman_collection.json)
+tiene ejemplos; su variable `{{baseUrl}}` se cambia a la API pública o a `http://localhost:8080`.
+
+| Recurso | Rutas y métodos | Acceso principal |
+| --- | --- | --- |
+| Auth | `POST /auth/register`, `/login`, `/refresh`, `/logout` | Público |
+| Users | `GET /users/me`, `GET /users`, `PATCH /users/{id}/roles` | Usuario / ADMIN |
+| Dishes | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
+| Ingredients | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
+| Protein Categories | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
+| Dish Ingredients | `GET`, `GET /{id}`, `POST`, `PUT /{id}`, `DELETE /{id}` | Lectura pública; escritura ADMIN/MANAGER |
+| Pantry, Favorites, Cooking History | `GET`, `POST`, `DELETE /{id}` | Usuario autenticado |
+| Recommendations | `GET /recommendations?availableMinutes=45&limit=10` | Usuario autenticado |
+| Status / Health | `GET /status`, `GET /actuator/health` | Público |
 
 ## Despliegue
 
-**URL pública (Railway):** [https://mankadbp-production.up.railway.app/](https://mankadbp-production.up.railway.app/). La instancia pública está de forma temporal en Railway, donde hay un servicio para la API y otro para PostgreSQL con volumen. AWS queda pendiente para una siguiente etapa. La API tiene `/actuator/health` para comprobar que está en línea.
+- **Backend:** imagen Docker en ECR, contenedor en una EC2 t3.micro (us-east-2) con variables en un archivo de entorno
+  fuera del repositorio. Solo CloudFront puede llegar al puerto 8080 de la instancia; CloudFront da HTTPS.
+- **Base de datos:** RDS PostgreSQL 16 privada; solo acepta conexiones desde la EC2.
+- **Web:** Vercel desde `main` (carpeta `web`), con `VITE_API_URL` como variable de entorno y un rewrite a `index.html`
+  para las rutas de React Router. El dominio de Vercel está en los orígenes CORS del backend.
+- **Móvil:** EAS Update en la rama `production` (se abre en Expo Go) y un APK de Android con EAS Build. La URL de la API
+  viene de `EXPO_PUBLIC_API_URL` en el entorno de EAS.
+- **CI:** GitHub Actions compila y ejecuta las pruebas en cada push.
 
-En el servicio de Railway se deben configurar `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`, `JWT_SECRET`, `CORS_ALLOWED_ORIGINS`, `MAIL_HOST` y `MAIL_FROM`; `PORT` lo proporciona la plataforma. El correo se activa con `MAIL_ENABLED` y las demás variables SMTP. `JPA_DDL_AUTO` tiene `update` como valor predeterminado para esta entrega. Las credenciales no se guardan en el repositorio.
+## Participación
 
-## GitHub y gestión
-
-El código se organiza en [GitHub](https://github.com/slesgmd/Manka_DBP), con `main` y la rama `feature/rubric-completion`. Los cambios de esta entrega se registraron desde la cuenta `slesgmd`. Los pendientes se siguieron mediante la rama de trabajo y los commits; no se usó un tablero de Projects ni Issues en este hito. GitHub Actions ejecuta `mvn -B clean verify --file pom.xml` en cada push y pull request, con JDK 25. Las pruebas usan H2, por lo que CI no necesita levantar PostgreSQL.
-
-## Apuntes en Obsidian
-
-Ya hay un avance de explicaciones de las partes del proyecto en una bóveda local de Obsidian. Los enlaces entre notas se pueden ver como un grafo y ayudan a entender cómo se conectan las partes del backend. Planeamos subir esa bóveda, o una guía visual equivalente, cuando esté completa; todavía no hay un enlace público.
-
-## Conclusión
-
-Con Manka se puede registrar una despensa, buscar platos y recibir recomendaciones que indican por qué un plato aparece antes que otro. También se guardan favoritos e historial. El aprendizaje principal fue separar controladores, servicios y repositorios, validar los datos de entrada y probar la seguridad de las rutas. Como siguientes pasos quedan probar con una base PostgreSQL real en CI, usar migraciones para el esquema, conectar el frontend y preparar un despliegue en AWS.
+| Integrante | Aportes principales | Participación |
+| --- | --- | --- |
+| Sebastián Lescano | Todos los componentes: backend, web, móvil y despliegue | 100 % |
 
 ## Apéndices
 
-**Licencia:** MIT, 2026, Juan Carlos Sebastian Lescano Garamendi, Luis Eduardo Strater Mc Lellan, Francisco José Lira Francia y Pablo Cesar Vega del Castillo. Véase [LICENSE](LICENSE).
+**Licencia:** MIT. Véase [LICENSE](LICENSE).
 
-**Referencias:** materiales de clase de CS 2031; [Spring Boot](https://docs.spring.io/spring-boot/reference/); [PostgreSQL](https://www.postgresql.org/docs/); [Railway](https://docs.railway.com/); [Postman](https://learning.postman.com/docs/use/use-collections/overview).
+**Referencias:** materiales de clase de CS 2031; [Spring Boot](https://docs.spring.io/spring-boot/reference/);
+[React](https://react.dev/); [Expo](https://docs.expo.dev/); [Open Food Facts API](https://openfoodfacts.github.io/openfoodfacts-server/api/);
+[AWS](https://docs.aws.amazon.com/); [Vercel](https://vercel.com/docs).
