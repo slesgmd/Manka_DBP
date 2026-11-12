@@ -5,7 +5,7 @@ import DishRow from "../components/DishRow";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
-import LoadingView from "../components/LoadingView";
+import ListSkeleton from "../components/ListSkeleton";
 import ScreenBackground from "../components/ScreenBackground";
 import ScreenHeader from "../components/ScreenHeader";
 import SearchField from "../components/SearchField";
@@ -21,7 +21,7 @@ export default function CatalogScreen() {
   const { dishes, total, loading, error, loadMore, retry } = useDishPages(search);
 
   const renderEmpty = () => {
-    if (loading) return <LoadingView label="Cargando platos…" />;
+    if (loading) return <ListSkeleton label="Cargando platos…" />;
     if (error) return <ErrorState title="No pudimos cargar el catálogo" error={error} onRetry={retry} />;
     return (
       <EmptyState

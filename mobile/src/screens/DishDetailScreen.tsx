@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useCallback, useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Button from "../components/Button";
 import DishImage from "../components/DishImage";
 import EmptyState from "../components/EmptyState";
@@ -13,6 +13,7 @@ import ScoreRing from "../components/ScoreRing";
 import ScreenBackground from "../components/ScreenBackground";
 import { useFetch } from "../hooks/useFetch";
 import { usePantry } from "../hooks/usePantry";
+import { useToast } from "../hooks/useToast";
 import { getDish } from "../services/dishService";
 import { addFavorite, getFavorites, removeFavorite } from "../services/favoriteService";
 import { addHistory, deleteHistory } from "../services/historyService";
@@ -29,6 +30,7 @@ export default function DishDetailScreen({ route, navigation }: Props) {
   const { data: dish, loading, error, retry } = useFetch(fetchDish);
   const favorites = useFetch(getFavorites);
   const pantry = usePantry();
+  const showToast = useToast();
   const [cooking, setCooking] = useState(false);
   const [savingFavorite, setSavingFavorite] = useState(false);
 
@@ -37,8 +39,9 @@ export default function DishDetailScreen({ route, navigation }: Props) {
   const undoCook = async (historyId: number) => {
     try {
       await deleteHistory(historyId);
+      showToast("Lo quitamos de tu historial.");
     } catch (err) {
-      Alert.alert("Historial", errorMessage(err, "No pudimos deshacerlo."));
+      showToast(errorMessage(err, "No pudimos deshacerlo."), { tone: "error" });
     }
   };
 
@@ -47,12 +50,9 @@ export default function DishDetailScreen({ route, navigation }: Props) {
     setCooking(true);
     try {
       const entry = await addHistory({ dishId });
-      Alert.alert("Agregado a tu historial", `${dish.name} ya está en tu historial.`, [
-        { text: "Deshacer", style: "destructive", onPress: () => undoCook(entry.id) },
-        { text: "Listo" },
-      ]);
+      showToast(`${dish.name} se agregó a tu historial.`, { actionLabel: "Deshacer", onAction: () => undoCook(entry.id) });
     } catch (err) {
-      Alert.alert("Historial", errorMessage(err, "No pudimos guardarlo en tu historial."));
+      showToast(errorMessage(err, "No pudimos guardarlo en tu historial."), { tone: "error" });
     }
     setCooking(false);
   };
@@ -62,12 +62,14 @@ export default function DishDetailScreen({ route, navigation }: Props) {
     try {
       if (isFavorite) {
         await removeFavorite(dishId);
+        showToast("Quitado de tus favoritos.");
       } else {
         await addFavorite({ dishId });
+        showToast("Guardado en tus favoritos.");
       }
       favorites.retry();
     } catch (err) {
-      Alert.alert("Favoritos", errorMessage(err, "No pudimos actualizar tus favoritos."));
+      showToast(errorMessage(err, "No pudimos actualizar tus favoritos."), { tone: "error" });
     }
     setSavingFavorite(false);
   };

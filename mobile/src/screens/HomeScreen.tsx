@@ -9,7 +9,7 @@ import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
 import IngredientSearch from "../components/IngredientSearch";
-import LoadingView from "../components/LoadingView";
+import ListSkeleton from "../components/ListSkeleton";
 import ScreenBackground from "../components/ScreenBackground";
 import ScreenHeader from "../components/ScreenHeader";
 import SegmentedControl from "../components/SegmentedControl";
@@ -17,6 +17,7 @@ import { useFetch } from "../hooks/useFetch";
 import { usePantry } from "../hooks/usePantry";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
 import { useShake } from "../hooks/useShake";
+import { useToast } from "../hooks/useToast";
 import { getIngredients } from "../services/ingredientService";
 import { removePantryItem } from "../services/pantryService";
 import { getRecommendations } from "../services/recommendationService";
@@ -30,6 +31,7 @@ import { colors, text } from "../utils/theme";
 export default function HomeScreen() {
   const navigation = useNavigation();
   const pantry = usePantry();
+  const showToast = useToast();
   const addToPantry = pantry.add;
   const [minutes, setMinutes] = useState("30");
   const [query, setQuery] = useState({ minutes: 30 });
@@ -67,11 +69,11 @@ export default function HomeScreen() {
 
   const surprise = useCallback(() => {
     if (!results || results.length === 0) {
-      Alert.alert("Sorpréndeme", "Primero agrega ingredientes y busca qué puedes cocinar.");
+      showToast("Primero agrega ingredientes y busca qué puedes cocinar.", { tone: "error" });
       return;
     }
     openDish(results[Math.floor(Math.random() * results.length)]);
-  }, [results, openDish]);
+  }, [results, openDish, showToast]);
 
   const shakeAvailable = useShake(surprise);
 
@@ -82,15 +84,15 @@ export default function HomeScreen() {
       const page = await getIngredients({ name, size: 20 });
       const match = page.content.find(ingredient => ingredient.name.toLowerCase() === name.toLowerCase());
       if (!match) {
-        Alert.alert("Despensa", `No encontramos ${name} en el catálogo de ingredientes.`);
+        showToast(`No encontramos ${name} en el catálogo de ingredientes.`, { tone: "error" });
         return;
       }
       await addToPantry(match.id, match.name);
       setQuery(prev => ({ ...prev }));
     } catch (err) {
-      Alert.alert("Despensa", errorMessage(err, `No pudimos agregar ${name}.`));
+      showToast(errorMessage(err, `No pudimos agregar ${name}.`), { tone: "error" });
     }
-  }, [addToPantry]);
+  }, [addToPantry, showToast]);
 
   const confirmRemove = (item: PantryItem) => {
     Alert.alert(`¿Quitar ${item.ingredientName.toLowerCase()}?`, "Dejará de contar para tus recomendaciones.", [
@@ -102,8 +104,9 @@ export default function HomeScreen() {
   const clearAll = async () => {
     try {
       await Promise.all((pantry.items ?? []).map(item => removePantryItem(item.ingredientId)));
+      showToast("Vaciaste tu despensa.");
     } catch (err) {
-      Alert.alert("Despensa", errorMessage(err, "No pudimos vaciar toda tu despensa."));
+      showToast(errorMessage(err, "No pudimos vaciar toda tu despensa."), { tone: "error" });
     }
     pantry.retry();
   };
@@ -130,7 +133,7 @@ export default function HomeScreen() {
       );
     }
     if (recommendations.loading && !results) {
-      return <LoadingView label="Buscando recomendaciones…" />;
+      return <ListSkeleton rows={4} label="Buscando recomendaciones…" />;
     }
     if (recommendations.error) {
       return <ErrorState title="No pudimos traer tus recomendaciones" error={recommendations.error} onRetry={recommendations.retry} />;
@@ -186,7 +189,7 @@ export default function HomeScreen() {
             <Button label="Limpiar todo" disabled={!pantry.items || pantry.items.length === 0} onPress={confirmClearAll} />
           </View>
           <IngredientSearch addedIds={pantry.ids} onAdd={handleAdd} />
-          {!pantry.items && pantry.loading && <LoadingView label="Cargando tu despensa…" />}
+          {!pantry.items && pantry.loading && <ListSkeleton rows={2} label="Cargando tu despensa…" />}
           {pantry.error && !pantry.items && (
             <View style={styles.inlineError}>
               <Text style={[text.subhead, styles.flex]}>No pudimos cargar tu despensa.</Text>

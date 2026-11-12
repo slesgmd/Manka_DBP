@@ -7,7 +7,7 @@ import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
 import IngredientSearch from "../components/IngredientSearch";
-import LoadingView from "../components/LoadingView";
+import ListSkeleton from "../components/ListSkeleton";
 import ScreenBackground from "../components/ScreenBackground";
 import ScreenHeader from "../components/ScreenHeader";
 import { usePantry } from "../hooks/usePantry";
@@ -35,7 +35,7 @@ export default function PantryScreen() {
   };
 
   const renderItems = () => {
-    if (!items && pantry.loading) return <LoadingView label="Cargando tu despensa…" />;
+    if (!items && pantry.loading) return <ListSkeleton label="Cargando tu despensa…" />;
     if (!items) return <ErrorState title="No pudimos cargar tu despensa" error={pantry.error} onRetry={pantry.retry} />;
     if (items.length === 0) {
       return (

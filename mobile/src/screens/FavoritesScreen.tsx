@@ -1,16 +1,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { ActivityIndicator, Alert, FlatList, Pressable, StyleSheet, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from "react-native";
 import DishRow from "../components/DishRow";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
-import LoadingView from "../components/LoadingView";
+import ListSkeleton from "../components/ListSkeleton";
 import ScreenBackground from "../components/ScreenBackground";
 import ScreenHeader from "../components/ScreenHeader";
 import { useFetch } from "../hooks/useFetch";
 import { useRefreshOnFocus } from "../hooks/useRefreshOnFocus";
+import { useToast } from "../hooks/useToast";
 import { getFavorites, removeFavorite } from "../services/favoriteService";
 import type { Favorite } from "../types/account";
 import { formatDate, plural } from "../utils/format";
@@ -21,6 +22,7 @@ export default function FavoritesScreen() {
   const navigation = useNavigation();
   const { data, loading, error, retry } = useFetch(getFavorites);
   const [removingId, setRemovingId] = useState<number | null>(null);
+  const showToast = useToast();
 
   useRefreshOnFocus(retry);
 
@@ -29,14 +31,15 @@ export default function FavoritesScreen() {
     try {
       await removeFavorite(favorite.dishId);
       retry();
+      showToast(`${favorite.dishName} se quitó de tus favoritos.`);
     } catch (err) {
-      Alert.alert("Favoritos", errorMessage(err, `No pudimos quitar ${favorite.dishName}.`));
+      showToast(errorMessage(err, `No pudimos quitar ${favorite.dishName}.`), { tone: "error" });
     }
     setRemovingId(null);
   };
 
   const renderEmpty = () => {
-    if (loading) return <LoadingView label="Cargando favoritos…" />;
+    if (loading) return <ListSkeleton label="Cargando favoritos…" />;
     if (error) return <ErrorState title="No pudimos cargar tus favoritos" error={error} onRetry={retry} />;
     return (
       <EmptyState

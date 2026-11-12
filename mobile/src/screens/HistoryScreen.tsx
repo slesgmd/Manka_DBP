@@ -5,7 +5,7 @@ import DishRow from "../components/DishRow";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
-import LoadingView from "../components/LoadingView";
+import ListSkeleton from "../components/ListSkeleton";
 import ScreenBackground from "../components/ScreenBackground";
 import { useFetch } from "../hooks/useFetch";
 import { getHistory } from "../services/historyService";
@@ -35,7 +35,7 @@ export default function HistoryScreen() {
   }, [data, sections]);
 
   const renderEmpty = () => {
-    if (loading) return <LoadingView label="Cargando historial…" />;
+    if (loading) return <ListSkeleton label="Cargando historial…" />;
     if (error) return <ErrorState title="No pudimos cargar tu historial" error={error} onRetry={retry} />;
     return (
       <EmptyState
