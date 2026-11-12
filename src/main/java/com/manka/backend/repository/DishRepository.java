@@ -25,7 +25,8 @@ public interface DishRepository extends JpaRepository<Dish, Long> {
     List<Dish> findAllForRecommendations();
 
     @EntityGraph(attributePaths = "proteinCategory")
-    @Query("select d from Dish d where (:name is null or lower(d.name) like lower(concat('%', :name, '%'))) "
+    @Query("select d from Dish d where (cast(:name as string) is null "
+            + "or lower(d.name) like lower(concat('%', cast(:name as string), '%'))) "
             + "and (:maxMinutes is null or d.totalTimeMinutes <= :maxMinutes) "
             + "and (:categoryId is null or d.proteinCategory.id = :categoryId)")
     Page<Dish> search(@Param("name") String name, @Param("maxMinutes") Integer maxMinutes,

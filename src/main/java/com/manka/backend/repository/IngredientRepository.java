@@ -17,7 +17,8 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Long> {
     List<Ingredient> findAll();
 
     @EntityGraph(attributePaths = "parentIngredient")
-    @Query("select i from Ingredient i where :name is null or lower(i.name) like lower(concat('%', :name, '%'))")
+    @Query("select i from Ingredient i where cast(:name as string) is null "
+            + "or lower(i.name) like lower(concat('%', cast(:name as string), '%'))")
     Page<Ingredient> search(@Param("name") String name, Pageable pageable);
 
     boolean existsByNameIgnoreCase(String name);
