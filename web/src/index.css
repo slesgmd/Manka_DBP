@@ -7,10 +7,10 @@ body {
 
 @media (max-width: 767px) {
   body {
-    background-image: var(--mk-bg-mob);
+    background-image: var(--mk-grain), var(--mk-bg-mob);
   }
 }
 
 .auth-bg {
-  background: var(--mk-base) var(--mk-bg-login) center / cover no-repeat;
+  background: var(--mk-grain) 0 0 / 180px repeat, var(--mk-base) var(--mk-bg-login) center / cover no-repeat;
 }

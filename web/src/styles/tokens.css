@@ -9,6 +9,7 @@
   --mk-bg-desk: url("/fondos/bg-l-desk.jpg");
   --mk-bg-mob: url("/fondos/bg-l-mob.jpg");
   --mk-bg-login: url("/fondos/bg-l-login.jpg");
+  --mk-grain: none;
 
   --mk-g-thick: rgba(255, 255, 255, 0.50);
   --mk-g-dense: rgba(255, 255, 255, 0.78);
@@ -76,6 +77,7 @@
   --mk-bg-desk: url("/fondos/bg-d-desk.jpg");
   --mk-bg-mob: url("/fondos/bg-d-mob.jpg");
   --mk-bg-login: url("/fondos/bg-d-login.jpg");
+  --mk-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --mk-g-thick: rgba(20, 23, 32, 0.70); --mk-g-dense: rgba(16, 18, 26, 0.84);
   --mk-g-thin: rgba(255, 255, 255, 0.10); --mk-g-arrow: rgba(20, 23, 32, 0.62); --mk-g-solid: #181B23;
   --mk-hi: rgba(255, 255, 255, 0.75); --mk-rim: rgba(210, 222, 255, 0.30); --mk-glow: rgba(150, 175, 255, 0.10);
@@ -100,6 +102,7 @@
     --mk-bg-desk: url("/fondos/bg-d-desk.jpg");
     --mk-bg-mob: url("/fondos/bg-d-mob.jpg");
     --mk-bg-login: url("/fondos/bg-d-login.jpg");
+    --mk-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     --mk-g-thick: rgba(20, 23, 32, 0.70); --mk-g-dense: rgba(16, 18, 26, 0.84);
     --mk-g-thin: rgba(255, 255, 255, 0.10); --mk-g-arrow: rgba(20, 23, 32, 0.62); --mk-g-solid: #181B23;
     --mk-hi: rgba(255, 255, 255, 0.75); --mk-rim: rgba(210, 222, 255, 0.30); --mk-glow: rgba(150, 175, 255, 0.10);

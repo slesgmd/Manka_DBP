@@ -3,7 +3,7 @@ import { useFetch } from "../../hooks/useFetch";
 import { useToast } from "../../hooks/useToast";
 import { createDishIngredient, deleteDishIngredient, getDishIngredients } from "../../services/dishIngredientService";
 import type { DishIngredient, Ingredient } from "../../types/catalog";
-import { statusOf } from "../../utils/http";
+import { errorMessage, statusOf } from "../../utils/http";
 import IngredientSearch from "../IngredientSearch";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import ErrorState from "../ui/ErrorState";
@@ -25,7 +25,7 @@ export default function DishIngredientsEditor({ dishId, dishName }: { dishId: nu
       showToast("success", `${ingredient.name} agregado a ${dishName}`);
       retry();
     } catch (err) {
-      showToast("error", statusOf(err) === 409 ? `${ingredient.name} ya está en el plato` : `No pudimos agregar ${ingredient.name}.`);
+      showToast("error", statusOf(err) === 409 ? `${ingredient.name} ya está en el plato.` : errorMessage(err, `No pudimos agregar ${ingredient.name}.`));
     }
   }, [dishId, dishName, retry, showToast]);
 
@@ -36,8 +36,8 @@ export default function DishIngredientsEditor({ dishId, dishName }: { dishId: nu
       await deleteDishIngredient(toRemove.id);
       showToast("success", `Quitaste ${toRemove.ingredientName} de ${dishName}`);
       retry();
-    } catch {
-      showToast("error", `No pudimos quitar ${toRemove.ingredientName}. Inténtalo otra vez.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos quitar ${toRemove.ingredientName}.`));
     }
     setRemoving(false);
     setToRemove(null);
@@ -47,7 +47,7 @@ export default function DishIngredientsEditor({ dishId, dishName }: { dishId: nu
     <div className="grid items-start gap-5 md:grid-cols-2">
       <div className="flex flex-col gap-2">
         <h3 className="text-headline font-medium">Ingredientes del plato</h3>
-        {error && !data && <ErrorState title="No pudimos cargar los ingredientes del plato" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />}
+        {error && !data && <ErrorState title="No pudimos cargar los ingredientes del plato" error={error} onRetry={retry} />}
         {!data && !error && <SkeletonBlock className="h-32 rounded-[22px]" />}
         {data && relations.length === 0 && <p className="py-3 text-subhead text-ink-2">Aún no tiene ingredientes. Búscalos a la derecha y agrégalos.</p>}
         <ul>

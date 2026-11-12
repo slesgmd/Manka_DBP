@@ -64,7 +64,7 @@ export default function CatalogPage() {
       );
     }
     if (error) {
-      return <ErrorState title="No pudimos cargar el catálogo" body="Tus filtros se mantienen. Revisa tu conexión e inténtalo otra vez." onRetry={retry} />;
+      return <ErrorState title="No pudimos cargar el catálogo" error={error} body="Tus filtros se mantienen." onRetry={retry} />;
     }
     if (data?.content.length === 0) {
       return (

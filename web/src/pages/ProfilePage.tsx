@@ -23,7 +23,7 @@ export default function ProfilePage() {
 
   const renderContent = () => {
     if (error) {
-      return <ErrorState title="No pudimos cargar tu perfil" body="Revisa tu conexión. Si tu sesión expiró, te pediremos que vuelvas a entrar." onRetry={retry} />;
+      return <ErrorState title="No pudimos cargar tu perfil" error={error} onRetry={retry} />;
     }
     if (loading || !user) {
       return (

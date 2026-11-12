@@ -4,6 +4,7 @@ import { useFetch } from "../../hooks/useFetch";
 import { useToast } from "../../hooks/useToast";
 import { getUsers, updateUserRoles } from "../../services/userService";
 import type { RoleName, User } from "../../types/auth";
+import { errorMessage } from "../../utils/http";
 import { formatShortDate, plural } from "../../utils/format";
 import { initials, mainRoleLabel, ROLE_LABELS } from "../../utils/user";
 import ErrorState from "../ui/ErrorState";
@@ -38,14 +39,14 @@ export default function UsersSection() {
       await updateUserRoles(user.id, { roles: [role] });
       showToast("success", `Rol de ${user.name} actualizado a ${ROLE_LABELS[role].toLowerCase()}`);
       retry();
-    } catch {
-      showToast("error", `No pudimos cambiar el rol de ${user.name}. Inténtalo otra vez.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos cambiar el rol de ${user.name}.`));
     }
     setSavingId(null);
   };
 
   if (error && !data) {
-    return <ErrorState title="No pudimos cargar los usuarios" body="Revisa tu conexión. Si ves «Sin permisos», tu rol ya no es de administrador." onRetry={retry} />;
+    return <ErrorState title="No pudimos cargar los usuarios" error={error} onRetry={retry} />;
   }
 
   if (!data) {

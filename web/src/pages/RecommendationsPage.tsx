@@ -23,6 +23,7 @@ import type { PantryItem } from "../types/account";
 import type { Ingredient } from "../types/catalog";
 import { buttonClass } from "../utils/buttonClass";
 import { plural } from "../utils/format";
+import { errorMessage } from "../utils/http";
 import { TIME_OPTIONS } from "../utils/recommendation";
 
 type PendingRemoval = { kind: "one"; item: PantryItem } | { kind: "all" };
@@ -78,8 +79,8 @@ export default function RecommendationsPage() {
       }
       await addToPantry(match.id, match.name);
       setQuery(prev => ({ ...prev }));
-    } catch {
-      showToast("error", `No pudimos agregar ${name}. Inténtalo otra vez.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos agregar ${name}.`));
     }
   }, [addToPantry, showToast]);
 
@@ -92,8 +93,8 @@ export default function RecommendationsPage() {
       try {
         await Promise.all((pantry.items ?? []).map(item => removePantryItem(item.ingredientId)));
         showToast("success", "Vaciaste tu despensa");
-      } catch {
-        showToast("error", "No pudimos vaciar toda tu despensa. Inténtalo otra vez.");
+      } catch (err) {
+        showToast("error", errorMessage(err, "No pudimos vaciar toda tu despensa."));
       }
       pantry.retry();
     }
@@ -126,7 +127,7 @@ export default function RecommendationsPage() {
       );
     }
     if (recommendations.error) {
-      return <ErrorState title="No pudimos traer tus recomendaciones" body="Revisa tu conexión e inténtalo otra vez." onRetry={recommendations.retry} />;
+      return <ErrorState title="No pudimos traer tus recomendaciones" error={recommendations.error} onRetry={recommendations.retry} />;
     }
     if (top.length === 0) {
       const next = TIME_OPTIONS.map(option => Number(option.value)).find(value => value > query.minutes);
@@ -174,7 +175,7 @@ export default function RecommendationsPage() {
       </PageHeader>
 
       <div className="grid items-start gap-5 lg:grid-cols-[360px_minmax(0,1fr)]">
-        <section className="glass flex flex-col gap-[18px] rounded-[38px] p-[22px]">
+        <section className="glass glass-lq flex flex-col gap-[18px] rounded-[38px] p-[22px]">
           <div className="flex items-center justify-between">
             <h2 className="pl-1 text-title3 font-medium text-title">Tu despensa</h2>
             <button

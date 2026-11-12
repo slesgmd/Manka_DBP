@@ -42,7 +42,7 @@ export default function BestOption({ options, index, minutes, onSelect, onAddMis
   const total = have ? have.length + current.missingIngredients.length : null;
 
   return (
-    <section aria-roledescription="carrusel" aria-label="Recomendaciones" className="glass flex flex-col rounded-[42px] p-3.5">
+    <section aria-roledescription="carrusel" aria-label="Recomendaciones" className="glass glass-lq flex flex-col rounded-[42px] p-3.5">
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-3.5 pb-3.5 pt-2">
         <h2 className="text-title2 font-medium text-title">{index === 0 ? "Mejor opción" : `Opción ${index + 1}`}</h2>
         <span className="text-subhead text-ink-2">{index + 1} de {options.length} · Para {minutes} min</span>

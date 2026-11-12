@@ -4,14 +4,28 @@ import { useForm } from "../../hooks/useForm";
 import { useToast } from "../../hooks/useToast";
 import { createDish, updateDish } from "../../services/dishService";
 import type { Dish, ProteinCategory } from "../../types/catalog";
-import { statusOf } from "../../utils/http";
+import { errorInfo, errorMessage, statusOf } from "../../utils/http";
 import Button from "../ui/Button";
-import FieldMessage from "../ui/FieldMessage";
 import FormAlert from "../ui/FormAlert";
 import SelectField from "../ui/SelectField";
 import TextField from "../ui/TextField";
 import DishIngredientsEditor from "./DishIngredientsEditor";
 import StepIndicator from "./StepIndicator";
+
+interface DishValues {
+  name: string;
+  minutes: string;
+  proteinCategoryId: string;
+}
+
+const validate = ({ name, minutes, proteinCategoryId }: DishValues) => {
+  const number = Number(minutes);
+  return {
+    name: !name.trim() ? "Escribe el nombre del plato." : name.length > 160 ? "Usa 160 caracteres como máximo." : undefined,
+    minutes: !minutes ? "Escribe los minutos." : !Number.isInteger(number) || number < 1 || number > 600 ? "Debe ser un número entero entre 1 y 600." : undefined,
+    proteinCategoryId: !proteinCategoryId ? "Elige una proteína." : undefined,
+  };
+};
 
 interface DishFormProps {
   dish: Dish | null;
@@ -23,24 +37,16 @@ export default function DishForm({ dish, proteins, onClose }: DishFormProps) {
   const { showToast } = useToast();
   const [step, setStep] = useState(1);
   const [saved, setSaved] = useState<Dish | null>(dish);
-  const { values, error, sending, setField, start, fail, done } = useForm({
+  const { values, error, sending, hasVisibleErrors, errorOf, setField, touch, start, fail, done } = useForm<DishValues>({
     name: dish?.name ?? "",
     minutes: dish ? String(dish.totalTimeMinutes) : "",
     proteinCategoryId: dish ? String(dish.proteinCategoryId) : "",
-  });
-
-  const name = values.name.trim();
-  const minutes = Number(values.minutes);
-  const nameOk = name.length > 0 && name.length <= 160;
-  const minutesOk = Number.isInteger(minutes) && minutes >= 1 && minutes <= 600;
-  const minutesBad = values.minutes !== "" && !minutesOk;
-  const valid = nameOk && minutesOk && values.proteinCategoryId !== "";
+  }, validate);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!valid || sending) return;
-    start();
-    const request = { name, totalTimeMinutes: minutes, proteinCategoryId: Number(values.proteinCategoryId) };
+    if (!start()) return;
+    const request = { name: values.name.trim(), totalTimeMinutes: Number(values.minutes), proteinCategoryId: Number(values.proteinCategoryId) };
     try {
       const result = saved ? await updateDish(saved.id, request) : await createDish(request);
       done();
@@ -48,7 +54,12 @@ export default function DishForm({ dish, proteins, onClose }: DishFormProps) {
       setSaved(result);
       setStep(2);
     } catch (err) {
-      fail(statusOf(err) === 409 ? "Ya existe un plato con ese nombre." : "No pudimos guardar el plato. Inténtalo otra vez.");
+      if (statusOf(err) === 409) {
+        fail("Ya existe un plato con ese nombre.", { name: "Elige otro nombre." });
+      } else {
+        const fields = errorInfo(err).fieldErrors;
+        fail(errorMessage(err, "No se pudo guardar el plato."), { name: fields.name, minutes: fields.totalTimeMinutes, proteinCategoryId: fields.proteinCategoryId });
+      }
     }
   };
 
@@ -69,8 +80,10 @@ export default function DishForm({ dish, proteins, onClose }: DishFormProps) {
             maxLength={160}
             placeholder="Por ejemplo, Lomo saltado"
             value={values.name}
+            error={errorOf("name")}
+            help={`Debe ser único. ${values.name.length} de 160 caracteres.`}
             onChange={e => setField("name", e.target.value)}
-            hint={<span className="font-normal text-ink-2">{values.name.length} de 160 caracteres</span>}
+            onBlur={() => touch("name")}
           />
           <TextField
             label="Minutos"
@@ -80,19 +93,23 @@ export default function DishForm({ dish, proteins, onClose }: DishFormProps) {
             max={600}
             placeholder="30"
             value={values.minutes}
-            invalid={minutesBad}
+            error={errorOf("minutes")}
+            help="Tiempo total, de 1 a 600."
             onChange={e => setField("minutes", e.target.value)}
-            hint={minutesBad && <FieldMessage ok={false} text="Entre 1 y 600 minutos" />}
+            onBlur={() => touch("minutes")}
           />
           <SelectField
             label="Proteína"
             options={proteinOptions}
             value={values.proteinCategoryId}
+            error={errorOf("proteinCategoryId")}
+            help="Se usa en los filtros del catálogo."
             onChange={e => setField("proteinCategoryId", e.target.value)}
+            onBlur={() => touch("proteinCategoryId")}
           />
           {error && <div className="md:col-span-3"><FormAlert message={error} /></div>}
           <div className="flex justify-end md:col-span-3">
-            <Button type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Guardando…">
+            <Button type="submit" kind="primary" disabled={hasVisibleErrors} loading={sending} loadingLabel="Guardando…">
               {saved ? "Guardar y seguir" : "Crear y seguir"}
             </Button>
           </div>

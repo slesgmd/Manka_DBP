@@ -11,7 +11,7 @@ export default function PublicRoute() {
 
   if (loading) return <Loading />;
   if (user) {
-    const target = from ? from.pathname + from.search : ROUTES.home;
+    const target = from ? from.pathname + from.search + from.hash : ROUTES.home;
     return <Navigate to={target} replace />;
   }
 

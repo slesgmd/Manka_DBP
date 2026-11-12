@@ -8,6 +8,7 @@ export const SESSION_EXPIRED_EVENT = "session-expired";
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL}/api/v1`,
   headers: { "Content-Type": "application/json" },
+  timeout: 15000,
 });
 
 api.interceptors.request.use((config) => {
@@ -18,7 +19,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
+type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean; _retries?: number };
+
+const MAX_RETRIES = 2;
+const RETRY_STATUSES = [502, 503, 504];
+
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+function canRetry(error: AxiosError, config: RetryConfig) {
+  const recoverable = error.code === "ERR_NETWORK" || RETRY_STATUSES.includes(error.response?.status ?? 0);
+  return config.method === "get" && recoverable && (config._retries ?? 0) < MAX_RETRIES && !config.signal?.aborted;
+}
 
 interface QueuedRequest {
   resolve: (token: string) => void;
@@ -43,6 +54,13 @@ api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original = error.config as RetryConfig | undefined;
+
+    if (original && canRetry(error, original)) {
+      original._retries = (original._retries ?? 0) + 1;
+      await wait(500 * 2 ** (original._retries - 1));
+      return api(original);
+    }
+
     const refreshToken = getRefreshToken();
 
     if (

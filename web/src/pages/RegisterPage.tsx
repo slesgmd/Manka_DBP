@@ -1,5 +1,4 @@
 import type { FormEvent } from "react";
-import axios from "axios";
 import AuthShell from "../components/AuthShell";
 import Button from "../components/ui/Button";
 import FieldMessage from "../components/ui/FieldMessage";
@@ -7,33 +6,36 @@ import FormAlert from "../components/ui/FormAlert";
 import TextField from "../components/ui/TextField";
 import { useAuth } from "../hooks/useAuth";
 import { useForm } from "../hooks/useForm";
-import type { ApiError } from "../types/common";
+import { errorInfo, errorMessage, statusOf } from "../utils/http";
 import { isValidEmail, passwordRules } from "../utils/validation";
+
+interface RegisterValues {
+  name: string;
+  email: string;
+  password: string;
+}
+
+const validate = ({ name, email, password }: RegisterValues) => ({
+  name: !name.trim() ? "Escribe tu nombre." : name.length > 120 ? "Usa 120 caracteres como máximo." : undefined,
+  email: !email ? "Escribe tu correo." : !isValidEmail(email) ? "Escribe un correo válido, por ejemplo tu@correo.com." : undefined,
+  password: passwordRules(password).every(rule => rule.ok) ? undefined : "La contraseña aún no cumple todas las reglas.",
+});
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const { values, error, sending, setField, start, fail } = useForm({ name: "", email: "", password: "" });
+  const { values, error, sending, hasVisibleErrors, errorOf, setField, touch, start, fail } = useForm<RegisterValues>({ name: "", email: "", password: "" }, validate);
   const { name, email, password } = values;
-
-  const emailOk = isValidEmail(email);
-  const emailBad = email.length > 0 && !emailOk;
-  const rules = passwordRules(password);
-  const nameOk = name.trim().length > 0 && name.length <= 120;
-  const valid = nameOk && emailOk && rules.every(rule => rule.ok);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!valid || sending) return;
-    start();
+    if (!start()) return;
     try {
       await register({ name: name.trim(), email, password });
     } catch (err) {
-      if (axios.isAxiosError<ApiError>(err) && err.response?.status === 409) {
-        fail("Ya hay una cuenta con ese correo.");
-      } else if (axios.isAxiosError<ApiError>(err) && err.response?.data?.message) {
-        fail(err.response.data.message);
+      if (statusOf(err) === 409) {
+        fail("Ya hay una cuenta con ese correo.", { email: "Este correo ya está registrado." });
       } else {
-        fail("No se pudo crear la cuenta. Inténtalo otra vez.");
+        fail(errorMessage(err, "No se pudo crear la cuenta."), errorInfo(err).fieldErrors);
       }
     }
   };
@@ -44,32 +46,38 @@ export default function RegisterPage() {
         label="Nombre"
         autoComplete="name"
         maxLength={120}
+        placeholder="Tu nombre y apellido"
         value={name}
+        error={errorOf("name")}
+        help={`Así te veremos en Manka. ${name.length} de 120 caracteres.`}
         onChange={e => setField("name", e.target.value)}
-        hint={<span className="font-normal text-ink-2">{name.length} de 120 caracteres</span>}
+        onBlur={() => touch("name")}
       />
       <TextField
         label="Correo"
         type="email"
         autoComplete="email"
+        placeholder="tu@correo.com"
         value={email}
-        invalid={emailBad}
+        error={errorOf("email")}
+        help="Lo usarás para iniciar sesión."
         onChange={e => setField("email", e.target.value)}
-        hint={emailOk
-          ? <FieldMessage ok text="Correo válido" />
-          : emailBad && <FieldMessage ok={false} text="Escribe un correo válido, por ejemplo nombre@dominio.com" />}
+        onBlur={() => touch("email")}
       />
       <TextField
         label="Contraseña"
         type="password"
         autoComplete="new-password"
         maxLength={72}
+        placeholder="Mínimo 8 caracteres"
         value={password}
+        error={errorOf("password")}
         onChange={e => setField("password", e.target.value)}
-        hint={rules.map(rule => <FieldMessage key={rule.text} ok={rule.ok} text={rule.text} />)}
+        onBlur={() => touch("password")}
+        hint={passwordRules(password).map(rule => <FieldMessage key={rule.text} ok={rule.ok} text={rule.text} />)}
       />
       {error && <FormAlert message={error} />}
-      <Button type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Creando cuenta…" className="mt-1 h-[58px]">
+      <Button type="submit" kind="primary" disabled={hasVisibleErrors} loading={sending} loadingLabel="Creando cuenta…" className="mt-1 h-[58px]">
         Crear cuenta
       </Button>
     </AuthShell>

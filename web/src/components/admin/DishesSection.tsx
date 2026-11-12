@@ -5,7 +5,7 @@ import { useToast } from "../../hooks/useToast";
 import { deleteDish, getDishes } from "../../services/dishService";
 import { getProteinCategories } from "../../services/proteinCategoryService";
 import type { Dish } from "../../types/catalog";
-import { statusOf } from "../../utils/http";
+import { errorMessage, statusOf } from "../../utils/http";
 import Button from "../ui/Button";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import DishImage from "../ui/DishImage";
@@ -48,10 +48,9 @@ export default function DishesSection() {
       showToast("success", `Borraste ${toDelete.name}`);
       retry();
     } catch (err) {
-      const status = statusOf(err);
-      showToast("error", status === 409 || status === 500
+      showToast("error", statusOf(err) === 409
         ? `No se puede borrar ${toDelete.name}: alguien lo tiene en favoritos o en su historial.`
-        : `No pudimos borrar ${toDelete.name}. Inténtalo otra vez.`);
+        : errorMessage(err, `No pudimos borrar ${toDelete.name}.`));
     }
     setDeleting(false);
     setToDelete(null);
@@ -74,7 +73,7 @@ export default function DishesSection() {
           </div>
         </div>
 
-        {error && !data && <ErrorState title="No pudimos cargar los platos" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />}
+        {error && !data && <ErrorState title="No pudimos cargar los platos" error={error} onRetry={retry} />}
         {!data && !error && (
           <div role="status" aria-label="Cargando platos" className="flex flex-col gap-3 p-2">
             {[0, 1, 2, 3].map(i => <SkeletonBlock key={i} className="h-14 rounded-[22px]" />)}

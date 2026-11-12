@@ -45,7 +45,7 @@ export default function PantryPage() {
       );
     }
     if (error && !items) {
-      return <ErrorState title="No pudimos cargar tu despensa" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />;
+      return <ErrorState title="No pudimos cargar tu despensa" error={error} onRetry={retry} />;
     }
     if (items?.length === 0) {
       return (

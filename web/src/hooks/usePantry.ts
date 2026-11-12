@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { addPantryItem, getPantryItems, removePantryItem } from "../services/pantryService";
-import { statusOf } from "../utils/http";
+import { errorMessage, statusOf } from "../utils/http";
 import { useFetch } from "./useFetch";
 import { useToast } from "./useToast";
 
@@ -16,7 +16,7 @@ export function usePantry() {
       showToast("success", `${name} agregado a tu despensa`);
       retry();
     } catch (err) {
-      showToast("error", statusOf(err) === 409 ? `${name} ya está en tu despensa` : `No pudimos agregar ${name}. Inténtalo otra vez.`);
+      showToast("error", statusOf(err) === 409 ? `${name} ya está en tu despensa.` : errorMessage(err, `No pudimos agregar ${name}.`));
     }
   }, [retry, showToast]);
 
@@ -26,8 +26,8 @@ export function usePantry() {
       showToast("success", `Quitaste ${name} de tu despensa`);
       retry();
       return true;
-    } catch {
-      showToast("error", `No pudimos quitar ${name}. Inténtalo otra vez.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos quitar ${name}.`));
       return false;
     }
   }, [retry, showToast]);

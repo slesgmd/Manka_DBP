@@ -4,7 +4,7 @@ import { usePagination } from "../../hooks/usePagination";
 import { useToast } from "../../hooks/useToast";
 import { deleteIngredient, getIngredients } from "../../services/ingredientService";
 import type { Ingredient } from "../../types/catalog";
-import { statusOf } from "../../utils/http";
+import { errorMessage, statusOf } from "../../utils/http";
 import Button from "../ui/Button";
 import ConfirmDialog from "../ui/ConfirmDialog";
 import ErrorState from "../ui/ErrorState";
@@ -45,10 +45,9 @@ export default function IngredientsSection() {
       showToast("success", `Borraste ${toDelete.name}`);
       retry();
     } catch (err) {
-      const status = statusOf(err);
-      showToast("error", status === 409 || status === 500
+      showToast("error", statusOf(err) === 409
         ? `No se puede borrar ${toDelete.name}: lo usan platos, despensas o variantes.`
-        : `No pudimos borrar ${toDelete.name}. Inténtalo otra vez.`);
+        : errorMessage(err, `No pudimos borrar ${toDelete.name}.`));
     }
     setDeleting(false);
     setToDelete(null);
@@ -69,7 +68,7 @@ export default function IngredientsSection() {
           </div>
         </div>
 
-        {error && !data && <ErrorState title="No pudimos cargar los ingredientes" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />}
+        {error && !data && <ErrorState title="No pudimos cargar los ingredientes" error={error} onRetry={retry} />}
         {!data && !error && (
           <div role="status" aria-label="Cargando ingredientes" className="flex flex-col gap-3 p-2">
             {[0, 1, 2, 3].map(i => <SkeletonBlock key={i} className="h-12 rounded-[22px]" />)}

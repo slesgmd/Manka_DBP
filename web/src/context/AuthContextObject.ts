@@ -4,6 +4,7 @@ import type { LoginRequest, RegisterRequest, RoleName, User } from "../types/aut
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
+  expired: boolean;
   login: (data: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;

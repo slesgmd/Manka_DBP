@@ -57,7 +57,7 @@ export default function HistoryPage() {
       );
     }
     if (error && !data) {
-      return <ErrorState title="No pudimos cargar tu historial" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />;
+      return <ErrorState title="No pudimos cargar tu historial" error={error} onRetry={retry} />;
     }
     if (sorted.length === 0) {
       return (

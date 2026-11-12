@@ -3,21 +3,23 @@ import { useForm } from "../../hooks/useForm";
 import { useToast } from "../../hooks/useToast";
 import { createIngredient, updateIngredient } from "../../services/ingredientService";
 import type { Ingredient } from "../../types/catalog";
-import { statusOf } from "../../utils/http";
+import { errorInfo, errorMessage, statusOf } from "../../utils/http";
 import Button from "../ui/Button";
 import FormAlert from "../ui/FormAlert";
 import TextField from "../ui/TextField";
 
+const validate = ({ name }: { name: string }) => ({
+  name: !name.trim() ? "Escribe el nombre del ingrediente." : name.length > 120 ? "Usa 120 caracteres como máximo." : undefined,
+});
+
 export default function IngredientForm({ ingredient, onClose }: { ingredient: Ingredient | null; onClose: (saved: boolean) => void }) {
   const { showToast } = useToast();
-  const { values, error, sending, setField, start, fail, done } = useForm({ name: ingredient?.name ?? "" });
+  const { values, error, sending, hasVisibleErrors, errorOf, setField, touch, start, fail, done } = useForm({ name: ingredient?.name ?? "" }, validate);
   const name = values.name.trim();
-  const valid = name.length > 0 && name.length <= 120;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (!valid || sending) return;
-    start();
+    if (!start()) return;
     try {
       const result = ingredient
         ? await updateIngredient(ingredient.id, { name, parentIngredientId: ingredient.parentIngredientId })
@@ -26,7 +28,11 @@ export default function IngredientForm({ ingredient, onClose }: { ingredient: In
       showToast("success", ingredient ? `Guardaste ${result.name}` : `Creaste ${result.name}`);
       onClose(true);
     } catch (err) {
-      fail(statusOf(err) === 409 ? "Ya existe un ingrediente con ese nombre." : "No pudimos guardar el ingrediente. Inténtalo otra vez.");
+      if (statusOf(err) === 409) {
+        fail("Ya existe un ingrediente con ese nombre.", { name: "Elige otro nombre." });
+      } else {
+        fail(errorMessage(err, "No se pudo guardar el ingrediente."), errorInfo(err).fieldErrors);
+      }
     }
   };
 
@@ -39,13 +45,15 @@ export default function IngredientForm({ ingredient, onClose }: { ingredient: In
           maxLength={120}
           placeholder="Por ejemplo, Ají amarillo"
           value={values.name}
+          error={errorOf("name")}
+          help={`Debe ser único. ${values.name.length} de 120 caracteres.`}
           onChange={e => setField("name", e.target.value)}
-          hint={<span className="font-normal text-ink-2">{values.name.length} de 120 caracteres</span>}
+          onBlur={() => touch("name")}
         />
         {error && <FormAlert message={error} />}
         <div className="flex flex-wrap justify-end gap-2.5">
           <Button size="md" onClick={() => onClose(false)} disabled={sending}>Cancelar</Button>
-          <Button size="md" type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Guardando…">
+          <Button size="md" type="submit" kind="primary" disabled={hasVisibleErrors} loading={sending} loadingLabel="Guardando…">
             {ingredient ? "Guardar cambios" : "Crear ingrediente"}
           </Button>
         </div>

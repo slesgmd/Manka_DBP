@@ -15,6 +15,7 @@ import type { Favorite } from "../types/account";
 import { buttonClass } from "../utils/buttonClass";
 import { cx } from "../utils/cx";
 import { formatDate, plural } from "../utils/format";
+import { errorMessage } from "../utils/http";
 
 export default function FavoritesPage() {
   const { showToast } = useToast();
@@ -26,8 +27,8 @@ export default function FavoritesPage() {
     try {
       await addFavorite({ dishId: favorite.dishId });
       retry();
-    } catch {
-      showToast("error", `No pudimos volver a guardar ${favorite.dishName}.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos volver a guardar ${favorite.dishName}.`));
     }
   };
 
@@ -39,8 +40,8 @@ export default function FavoritesPage() {
       await removeFavorite(favorite.dishId);
       showToast("success", `Quitaste ${favorite.dishName} de favoritos`, { label: "Deshacer", onClick: () => undo(favorite) });
       retry();
-    } catch {
-      showToast("error", `No pudimos quitar ${favorite.dishName}. Inténtalo otra vez.`);
+    } catch (err) {
+      showToast("error", errorMessage(err, `No pudimos quitar ${favorite.dishName}.`));
     }
     setRemoving(false);
     setToRemove(null);
@@ -55,7 +56,7 @@ export default function FavoritesPage() {
       );
     }
     if (error && !data) {
-      return <ErrorState title="No pudimos cargar tus favoritos" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />;
+      return <ErrorState title="No pudimos cargar tus favoritos" error={error} onRetry={retry} />;
     }
     if (data?.length === 0) {
       return (

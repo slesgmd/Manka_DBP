@@ -1,8 +1,9 @@
 import { Suspense } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { ROUTES } from "../routes";
 import Breadcrumbs from "./Breadcrumbs";
+import ErrorBoundary from "./ErrorBoundary";
 import Loading from "./Loading";
 import Sidebar from "./Sidebar";
 import TabBar from "./TabBar";
@@ -11,9 +12,13 @@ import ThemeToggle from "./ui/ThemeToggle";
 
 export default function Layout() {
   const { logout } = useAuth();
+  const location = useLocation();
 
   return (
     <div className="flex min-h-screen gap-6 md:p-6">
+      <a href="#contenido" className="glass glass-dense sr-only z-50 rounded-full text-[15px] font-medium focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:px-5 focus:py-3">
+        Saltar al contenido
+      </a>
       <Sidebar className="sticky top-6 hidden h-[calc(100vh-48px)] min-h-[560px] md:flex" />
 
       <div className="flex min-w-0 flex-1 flex-col gap-4 px-4 pb-28 pt-4 md:p-0">
@@ -30,11 +35,13 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex flex-col gap-4">
+        <main id="contenido" tabIndex={-1} className="flex flex-col gap-4 focus:outline-none">
           <Breadcrumbs />
-          <Suspense fallback={<Loading />}>
-            <Outlet />
-          </Suspense>
+          <ErrorBoundary key={location.pathname}>
+            <Suspense fallback={<Loading />}>
+              <Outlet />
+            </Suspense>
+          </ErrorBoundary>
         </main>
       </div>
 

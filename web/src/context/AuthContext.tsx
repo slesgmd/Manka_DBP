@@ -5,10 +5,12 @@ import { AuthContext } from "./AuthContextObject";
 import * as authService from "../services/authService";
 import { SESSION_EXPIRED_EVENT } from "../services/api";
 import { clearTokens, getRefreshToken } from "../services/tokenStorage";
+import { statusOf } from "../utils/http";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(() => getRefreshToken() !== null);
+  const [expired, setExpired] = useState(false);
   const started = useRef(false);
 
   useEffect(() => {
@@ -18,29 +20,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     authService.refresh(refreshToken)
       .then(data => setUser(data.user))
-      .catch(() => clearTokens())
+      .catch(error => {
+        clearTokens();
+        if (statusOf(error) === 401) setExpired(true);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
-    const onExpired = () => setUser(null);
+    const onExpired = () => {
+      setUser(null);
+      setExpired(true);
+    };
     window.addEventListener(SESSION_EXPIRED_EVENT, onExpired);
     return () => window.removeEventListener(SESSION_EXPIRED_EVENT, onExpired);
   }, []);
 
   const login = async (data: LoginRequest) => {
     const response = await authService.login(data);
+    setExpired(false);
     setUser(response.user);
   };
 
   const register = async (data: RegisterRequest) => {
     const response = await authService.register(data);
+    setExpired(false);
     setUser(response.user);
   };
 
   const logout = async () => {
     try {
       await authService.logout();
+    } catch (error) {
+      console.error("No se pudo cerrar la sesión en el servidor", error);
     } finally {
       setUser(null);
     }
@@ -49,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const hasRole = (role: RoleName) => !!user?.roles.includes(role);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, loading, expired, login, register, logout, hasRole }}>
       {children}
     </AuthContext.Provider>
   );

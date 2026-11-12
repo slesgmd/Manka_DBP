@@ -25,7 +25,7 @@ export default function Sidebar({ className }: { className?: string }) {
   const { user, logout, hasRole } = useAuth();
 
   return (
-    <nav aria-label="Principal" className={cx("glass w-[264px] shrink-0 flex-col gap-1 rounded-[38px] p-3", className)}>
+    <nav aria-label="Principal" className={cx("glass glass-lq w-[264px] shrink-0 flex-col gap-1 rounded-[38px] p-3", className)}>
       <Link to={ROUTES.home} aria-label="Manka, inicio" className="mb-1.5 flex h-[58px] items-center gap-2.5 px-3.5">
         <Icon name="logo" size={26} strokeWidth={1.7} />
         <span className="text-[23px] font-medium tracking-[-0.03em] text-title">Manka</span>

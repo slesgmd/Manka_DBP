@@ -2,7 +2,9 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 import Layout from "./components/Layout";
+import OfflineBanner from "./components/OfflineBanner";
 import Loading from "./components/Loading";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
@@ -23,38 +25,41 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 
 function App() {
   return (
-    <BrowserRouter>
-      <LiquidFilters />
-      <AuthProvider>
-        <ToastProvider>
-          <Suspense fallback={<Loading />}>
-            <Routes>
-              <Route element={<PublicRoute />}>
-                <Route path={ROUTES.login} element={<LoginPage />} />
-                <Route path={ROUTES.register} element={<RegisterPage />} />
-              </Route>
+    <ErrorBoundary fullScreen>
+      <BrowserRouter>
+        <LiquidFilters />
+        <OfflineBanner />
+        <AuthProvider>
+          <ToastProvider>
+            <Suspense fallback={<Loading />}>
+              <Routes>
+                <Route element={<PublicRoute />}>
+                  <Route path={ROUTES.login} element={<LoginPage />} />
+                  <Route path={ROUTES.register} element={<RegisterPage />} />
+                </Route>
 
-              <Route element={<PrivateRoute />}>
-                <Route element={<Layout />}>
-                  <Route path={ROUTES.home} element={<RecommendationsPage />} />
-                  <Route path={ROUTES.catalog} element={<CatalogPage />} />
-                  <Route path={ROUTES.dish} element={<DishDetailPage />} />
-                  <Route path={ROUTES.pantry} element={<PantryPage />} />
-                  <Route path={ROUTES.favorites} element={<FavoritesPage />} />
-                  <Route path={ROUTES.history} element={<HistoryPage />} />
-                  <Route path={ROUTES.profile} element={<ProfilePage />} />
-                  <Route element={<PrivateRoute role="ADMIN" />}>
-                    <Route path={ROUTES.admin} element={<AdminPage />} />
+                <Route element={<PrivateRoute />}>
+                  <Route element={<Layout />}>
+                    <Route path={ROUTES.home} element={<RecommendationsPage />} />
+                    <Route path={ROUTES.catalog} element={<CatalogPage />} />
+                    <Route path={ROUTES.dish} element={<DishDetailPage />} />
+                    <Route path={ROUTES.pantry} element={<PantryPage />} />
+                    <Route path={ROUTES.favorites} element={<FavoritesPage />} />
+                    <Route path={ROUTES.history} element={<HistoryPage />} />
+                    <Route path={ROUTES.profile} element={<ProfilePage />} />
+                    <Route element={<PrivateRoute role="ADMIN" />}>
+                      <Route path={ROUTES.admin} element={<AdminPage />} />
+                    </Route>
                   </Route>
                 </Route>
-              </Route>
 
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </ToastProvider>
-      </AuthProvider>
-    </BrowserRouter>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </ToastProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

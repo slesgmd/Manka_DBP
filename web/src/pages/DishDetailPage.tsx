@@ -17,7 +17,7 @@ import { addFavorite, getFavorites, removeFavorite } from "../services/favoriteS
 import { addHistory, deleteHistory } from "../services/historyService";
 import type { Recommendation } from "../types/account";
 import { buttonClass } from "../utils/buttonClass";
-import { statusOf } from "../utils/http";
+import { errorMessage, statusOf } from "../utils/http";
 
 export default function DishDetailPage() {
   const { id } = useParams();
@@ -39,8 +39,8 @@ export default function DishDetailPage() {
     try {
       await deleteHistory(historyId);
       showToast("success", "Quitado de tu historial");
-    } catch {
-      showToast("error", "No pudimos deshacerlo. Inténtalo otra vez.");
+    } catch (err) {
+      showToast("error", errorMessage(err, "No pudimos deshacerlo."));
     }
   };
 
@@ -49,8 +49,8 @@ export default function DishDetailPage() {
     try {
       const entry = await addHistory({ dishId });
       showToast("success", "Agregado a tu historial", { label: "Deshacer", onClick: () => undoCook(entry.id) });
-    } catch {
-      showToast("error", "No pudimos guardarlo en tu historial. Inténtalo otra vez.");
+    } catch (err) {
+      showToast("error", errorMessage(err, "No pudimos guardarlo en tu historial."));
     }
     setCooking(false);
   };
@@ -67,8 +67,8 @@ export default function DishDetailPage() {
         showToast("success", `${dish.name} guardado en favoritos`);
       }
       favorites.retry();
-    } catch {
-      showToast("error", "No pudimos actualizar tus favoritos. Inténtalo otra vez.");
+    } catch (err) {
+      showToast("error", errorMessage(err, "No pudimos actualizar tus favoritos."));
     }
     setSavingFavorite(false);
   };
@@ -85,7 +85,7 @@ export default function DishDetailPage() {
   }
 
   if (error) {
-    return <ErrorState title="No pudimos cargar el plato" body="Revisa tu conexión e inténtalo otra vez." onRetry={retry} />;
+    return <ErrorState title="No pudimos cargar el plato" error={error} onRetry={retry} />;
   }
 
   if (loading || !dish) {
