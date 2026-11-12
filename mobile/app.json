@@ -22,12 +22,8 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
-    ],
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#C9CEDC"
-    }
+      "expo-secure-store",
+      "expo-font"
+    ]
   }
 }
