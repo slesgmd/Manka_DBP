@@ -60,7 +60,7 @@ reciente (20 %) y popularidad (15 %). La respuesta explica cada criterio y muest
 | OpenAPI (JSON) | https://d2bql0rp3k9uia.cloudfront.net/v3/api-docs |
 | Salud | https://d2bql0rp3k9uia.cloudfront.net/actuator/health |
 | Móvil, EAS Update para Expo Go (Android) | https://expo.dev/accounts/seblescano/projects/manka/updates/67f14ec6-0469-4bd7-8adf-d6dc2bdf50ba |
-| Móvil, APK de Android | https://expo.dev/accounts/seblescano/projects/manka/builds/752ddd7e-e9b5-4db2-b45d-afe5a26e0c72 |
+| Móvil, APK de Android | Descarga: https://expo.dev/artifacts/eas/0nu9dBZFPkecfz46r86UfpUjOKrJbfjk3cljvYmjw4w.apk (build: https://expo.dev/accounts/seblescano/projects/manka/builds/752ddd7e-e9b5-4db2-b45d-afe5a26e0c72) |
 | Repositorio | https://github.com/slesgmd/Manka_DBP |
 
 **Usuario de demo (rol USER):** `prueba.rutas.1111@manka.pe` / `Prueba1234`.
