@@ -16,7 +16,11 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.CAMERA"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -38,6 +42,16 @@
           "motionPermission": "Manka usa el movimiento del celular para que agites y recibas un plato sorpresa."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "57bc1400-3db3-4bb7-8303-42a76182ced7"
+      }
+    },
+    "owner": "seblescano",
+    "updates": {
+      "url": "https://u.expo.dev/57bc1400-3db3-4bb7-8303-42a76182ced7"
+    },
+    "runtimeVersion": "exposdk:58.0.0"
   }
 }
