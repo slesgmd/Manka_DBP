@@ -7,14 +7,15 @@ import DishDetailScreen from "../screens/DishDetailScreen";
 import FavoritesScreen from "../screens/FavoritesScreen";
 import HistoryScreen from "../screens/HistoryScreen";
 import HomeScreen from "../screens/HomeScreen";
+import LoadingScreen from "../screens/LoadingScreen";
 import LoginScreen from "../screens/LoginScreen";
 import PantryScreen from "../screens/PantryScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import { useAuth } from "../hooks/useAuth";
 import type { RootStackParamList, TabParamList } from "../types/navigation";
+import type { IconName } from "../types/ui";
 import { colors } from "../utils/theme";
-
-type IconName = keyof typeof Ionicons.glyphMap;
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
@@ -55,7 +56,11 @@ function Tabs() {
   );
 }
 
-export default function AppNavigator({ signedIn }: { signedIn: boolean }) {
+export default function AppNavigator() {
+  const { user, loading } = useAuth();
+
+  if (loading) return <LoadingScreen />;
+
   return (
     <NavigationContainer theme={navigationTheme}>
       <Stack.Navigator
@@ -67,7 +72,7 @@ export default function AppNavigator({ signedIn }: { signedIn: boolean }) {
           headerBackButtonDisplayMode: "minimal",
         }}
       >
-        {signedIn ? (
+        {user ? (
           <>
             <Stack.Screen name="Tabs" component={Tabs} />
             <Stack.Screen
