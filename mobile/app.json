@@ -20,7 +20,8 @@
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.CAMERA"
-      ]
+      ],
+      "package": "com.seblescano.manka"
     },
     "web": {
       "favicon": "./assets/favicon.png"
