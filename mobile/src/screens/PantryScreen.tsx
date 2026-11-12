@@ -1,6 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Button from "../components/Button";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import GlassView from "../components/GlassView";
@@ -16,6 +18,7 @@ import { formatDate, plural } from "../utils/format";
 import { colors, TARGET, text } from "../utils/theme";
 
 export default function PantryScreen() {
+  const navigation = useNavigation();
   const pantry = usePantry();
   const addToPantry = pantry.add;
   const items = pantry.items;
@@ -39,7 +42,9 @@ export default function PantryScreen() {
         <EmptyState
           icon="basket-outline"
           title="Tu despensa está vacía"
-          body="Busca arriba lo que tienes en casa y agrégalo para recibir recomendaciones."
+          body="Busca arriba lo que tienes en casa o escanea el código de barras de un producto."
+          actionLabel="Escanear producto"
+          onAction={() => navigation.navigate("Scanner")}
         />
       );
     }
@@ -76,6 +81,7 @@ export default function PantryScreen() {
         <GlassView style={styles.add}>
           <Text style={text.title3}>Agregar ingrediente</Text>
           <IngredientSearch addedIds={pantry.ids} onAdd={handleAdd} />
+          <Button label="Escanear producto" icon="barcode-outline" onPress={() => navigation.navigate("Scanner")} />
           <Text style={text.footnote}>Solo un administrador puede crear ingredientes nuevos.</Text>
         </GlassView>
         {renderItems()}

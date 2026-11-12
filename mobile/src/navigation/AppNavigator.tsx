@@ -12,6 +12,7 @@ import LoginScreen from "../screens/LoginScreen";
 import PantryScreen from "../screens/PantryScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import RegisterScreen from "../screens/RegisterScreen";
+import ScannerScreen from "../screens/ScannerScreen";
 import { useAuth } from "../hooks/useAuth";
 import type { RootStackParamList, TabParamList } from "../types/navigation";
 import type { IconName } from "../types/ui";
@@ -81,6 +82,7 @@ export default function AppNavigator() {
               options={({ route }) => ({ headerShown: true, title: route.params.name ?? "Plato" })}
             />
             <Stack.Screen name="History" component={HistoryScreen} options={{ headerShown: true, title: "Historial" }} />
+            <Stack.Screen name="Scanner" component={ScannerScreen} options={{ headerShown: true, title: "Escanear producto" }} />
           </>
         ) : (
           <>

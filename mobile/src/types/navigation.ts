@@ -15,6 +15,7 @@ export type RootStackParamList = {
   Tabs: NavigatorScreenParams<TabParamList> | undefined;
   DishDetail: { dishId: number; name?: string; recommendation?: Recommendation };
   History: undefined;
+  Scanner: undefined;
 };
 
 declare global {

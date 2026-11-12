@@ -23,7 +23,21 @@
     },
     "plugins": [
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Manka usa la cámara para leer el código de barras de tus productos y agregarlos a tu despensa.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-sensors",
+        {
+          "motionPermission": "Manka usa el movimiento del celular para que agites y recibas un plato sorpresa."
+        }
+      ]
     ]
   }
 }

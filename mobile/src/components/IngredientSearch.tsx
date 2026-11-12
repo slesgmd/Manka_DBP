@@ -13,10 +13,11 @@ import { colors, radius, TARGET, text } from "../utils/theme";
 interface IngredientSearchProps {
   addedIds: Set<number>;
   onAdd: (ingredient: Ingredient) => Promise<void>;
+  initialQuery?: string;
 }
 
-export default function IngredientSearch({ addedIds, onAdd }: IngredientSearchProps) {
-  const [query, setQuery] = useState("");
+export default function IngredientSearch({ addedIds, onAdd, initialQuery = "" }: IngredientSearchProps) {
+  const [query, setQuery] = useState(initialQuery);
   const [busyId, setBusyId] = useState<number | null>(null);
   const name = useDebounce(query.trim(), 350);
 
