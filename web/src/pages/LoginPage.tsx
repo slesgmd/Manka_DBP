@@ -1,39 +1,30 @@
-import { useState } from "react";
 import type { FormEvent } from "react";
-import axios from "axios";
 import AuthShell from "../components/AuthShell";
 import Button from "../components/ui/Button";
 import FieldMessage from "../components/ui/FieldMessage";
 import FormAlert from "../components/ui/FormAlert";
 import TextField from "../components/ui/TextField";
 import { useAuth } from "../hooks/useAuth";
+import { useForm } from "../hooks/useForm";
+import { statusOf } from "../utils/http";
 import { isValidEmail } from "../utils/validation";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
+  const { values, error, sending, setField, start, fail } = useForm({ email: "", password: "" });
 
-  const emailOk = isValidEmail(email);
-  const emailBad = email.length > 0 && !emailOk;
-  const valid = emailOk && password.length > 0;
+  const emailOk = isValidEmail(values.email);
+  const emailBad = values.email.length > 0 && !emailOk;
+  const valid = emailOk && values.password.length > 0;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!valid || sending) return;
-    setError(null);
-    setSending(true);
+    start();
     try {
-      await login({ email, password });
+      await login(values);
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        setError("El correo o la contraseña no son correctos.");
-      } else {
-        setError("No se pudo iniciar sesión. Inténtalo otra vez.");
-      }
-      setSending(false);
+      fail(statusOf(err) === 401 ? "El correo o la contraseña no son correctos." : "No se pudo iniciar sesión. Inténtalo otra vez.");
     }
   };
 
@@ -43,9 +34,9 @@ export default function LoginPage() {
         label="Correo"
         type="email"
         autoComplete="email"
-        value={email}
+        value={values.email}
         invalid={emailBad}
-        onChange={e => { setEmail(e.target.value); setError(null); }}
+        onChange={e => setField("email", e.target.value)}
         hint={emailOk
           ? <FieldMessage ok text="Correo válido" />
           : emailBad && <FieldMessage ok={false} text="Escribe un correo válido, por ejemplo nombre@dominio.com" />}
@@ -54,8 +45,8 @@ export default function LoginPage() {
         label="Contraseña"
         type="password"
         autoComplete="current-password"
-        value={password}
-        onChange={e => { setPassword(e.target.value); setError(null); }}
+        value={values.password}
+        onChange={e => setField("password", e.target.value)}
       />
       {error && <FormAlert message={error} />}
       <Button type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Entrando…" className="mt-1 h-[58px]">

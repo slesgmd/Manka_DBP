@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
 interface FetchState<T> {
@@ -24,7 +24,7 @@ export function useFetch<T>(fetcher: (signal: AbortSignal) => Promise<T>) {
     return () => controller.abort();
   }, [request]);
 
-  const retry = () => setAttempt(a => a + 1);
+  const retry = useCallback(() => setAttempt(a => a + 1), []);
 
   return {
     data: state.data,

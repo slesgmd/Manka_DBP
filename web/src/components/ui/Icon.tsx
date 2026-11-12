@@ -14,6 +14,14 @@ const paths = {
   check: "m5 12 5 5 9-10",
   cross: "M18 6 6 18M6 6l12 12",
   chevron: "m9 6 6 6-6 6",
+  back: "m15 6-6 6 6 6",
+  down: "m6 9 6 6 6-6",
+  plus: "M12 5v14M5 12h14",
+  search: "M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-3.5-3.5",
+  trash: "M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3",
+  edit: "M4 20h4L19 9l-4-4L4 16zM14 6l4 4",
+  clock: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2",
+  shuffle: "M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5",
 };
 
 export type IconName = keyof typeof paths;
@@ -23,11 +31,12 @@ interface IconProps {
   size?: number;
   strokeWidth?: number;
   color?: string;
+  fill?: string;
 }
 
-export default function Icon({ name, size = 20, strokeWidth = 1.8, color = "currentColor" }: IconProps) {
+export default function Icon({ name, size = 20, strokeWidth = 1.8, color = "currentColor", fill = "none" }: IconProps) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
       <path d={paths[name]} />
     </svg>
   );

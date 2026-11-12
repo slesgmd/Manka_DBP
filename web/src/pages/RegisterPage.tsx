@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { FormEvent } from "react";
 import axios from "axios";
 import AuthShell from "../components/AuthShell";
@@ -7,16 +6,14 @@ import FieldMessage from "../components/ui/FieldMessage";
 import FormAlert from "../components/ui/FormAlert";
 import TextField from "../components/ui/TextField";
 import { useAuth } from "../hooks/useAuth";
+import { useForm } from "../hooks/useForm";
 import type { ApiError } from "../types/common";
 import { isValidEmail, passwordRules } from "../utils/validation";
 
 export default function RegisterPage() {
   const { register } = useAuth();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [sending, setSending] = useState(false);
+  const { values, error, sending, setField, start, fail } = useForm({ name: "", email: "", password: "" });
+  const { name, email, password } = values;
 
   const emailOk = isValidEmail(email);
   const emailBad = email.length > 0 && !emailOk;
@@ -27,19 +24,17 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!valid || sending) return;
-    setError(null);
-    setSending(true);
+    start();
     try {
       await register({ name: name.trim(), email, password });
     } catch (err) {
       if (axios.isAxiosError<ApiError>(err) && err.response?.status === 409) {
-        setError("Ya hay una cuenta con ese correo.");
+        fail("Ya hay una cuenta con ese correo.");
       } else if (axios.isAxiosError<ApiError>(err) && err.response?.data?.message) {
-        setError(err.response.data.message);
+        fail(err.response.data.message);
       } else {
-        setError("No se pudo crear la cuenta. Inténtalo otra vez.");
+        fail("No se pudo crear la cuenta. Inténtalo otra vez.");
       }
-      setSending(false);
     }
   };
 
@@ -50,7 +45,7 @@ export default function RegisterPage() {
         autoComplete="name"
         maxLength={120}
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={e => setField("name", e.target.value)}
         hint={<span className="font-normal text-ink-2">{name.length} de 120 caracteres</span>}
       />
       <TextField
@@ -59,7 +54,7 @@ export default function RegisterPage() {
         autoComplete="email"
         value={email}
         invalid={emailBad}
-        onChange={e => { setEmail(e.target.value); setError(null); }}
+        onChange={e => setField("email", e.target.value)}
         hint={emailOk
           ? <FieldMessage ok text="Correo válido" />
           : emailBad && <FieldMessage ok={false} text="Escribe un correo válido, por ejemplo nombre@dominio.com" />}
@@ -70,7 +65,7 @@ export default function RegisterPage() {
         autoComplete="new-password"
         maxLength={72}
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={e => setField("password", e.target.value)}
         hint={rules.map(rule => <FieldMessage key={rule.text} ok={rule.ok} text={rule.text} />)}
       />
       {error && <FormAlert message={error} />}

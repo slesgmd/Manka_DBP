@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import { ROUTE_LABELS, ROUTES } from "../routes";
 
 export default function Breadcrumbs() {
-  const { pathname } = useLocation();
+  const { pathname, state } = useLocation();
+  const dishName = (state as { name?: string } | null)?.name;
   const parts = pathname.split("/").filter(Boolean);
 
   if (parts.length === 0) return null;
@@ -10,7 +11,7 @@ export default function Breadcrumbs() {
   const crumbs = [{ label: "Inicio", to: ROUTES.home }];
   if (parts[0] === "platos") {
     crumbs.push({ label: ROUTE_LABELS.platos, to: ROUTES.catalog });
-    if (parts[1]) crumbs.push({ label: `Plato ${parts[1]}`, to: pathname });
+    if (parts[1]) crumbs.push({ label: dishName ?? `Plato ${parts[1]}`, to: pathname });
   } else {
     crumbs.push({ label: ROUTE_LABELS[parts[0]] ?? parts[0], to: pathname });
   }
