@@ -183,7 +183,7 @@ export default function DishDetailScreen({ route, navigation }: Props) {
 const styles = StyleSheet.create({
   content: { padding: 16, gap: 16, paddingBottom: 32 },
   photoPanel: { padding: 10 },
-  photo: { width: "100%", aspectRatio: 4 / 3, borderRadius: radius.inner },
+  photo: { width: "100%", aspectRatio: 3 / 2, borderRadius: radius.inner },
   info: { padding: 20, gap: 8 },
   actions: { flexDirection: "row", alignItems: "center", gap: 10, marginTop: 8 },
   favorite: {

@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
   container: { gap: 16 },
   panel: { padding: 12 },
   heading: { paddingHorizontal: 8, paddingTop: 4, paddingBottom: 12, gap: 2 },
-  photo: { width: "100%", aspectRatio: 4 / 3, borderRadius: radius.inner },
+  photo: { width: "100%", aspectRatio: 3 / 2, borderRadius: radius.inner },
   arrow: {
     position: "absolute",
     top: "50%",
