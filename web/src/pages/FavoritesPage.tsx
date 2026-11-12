@@ -1,3 +1,5 @@
+import PageHeader from "../components/PageHeader";
+
 export default function FavoritesPage() {
-  return <h1 className="text-2xl font-bold">Favoritos</h1>;
+  return <PageHeader title="Favoritos" />;
 }

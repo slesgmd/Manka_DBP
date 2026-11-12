@@ -1,12 +1,14 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-import { ROUTES } from "../routes";
+import AuthShell from "../components/AuthShell";
+import Button from "../components/ui/Button";
+import FieldMessage from "../components/ui/FieldMessage";
+import FormAlert from "../components/ui/FormAlert";
+import TextField from "../components/ui/TextField";
+import { useAuth } from "../hooks/useAuth";
 import type { ApiError } from "../types/common";
-
-const inputClass = "w-full border rounded px-3 py-2";
+import { isValidEmail, passwordRules } from "../utils/validation";
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -16,12 +18,19 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
+  const emailOk = isValidEmail(email);
+  const emailBad = email.length > 0 && !emailOk;
+  const rules = passwordRules(password);
+  const nameOk = name.trim().length > 0 && name.length <= 120;
+  const valid = nameOk && emailOk && rules.every(rule => rule.ok);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!valid || sending) return;
     setError(null);
     setSending(true);
     try {
-      await register({ name, email, password });
+      await register({ name: name.trim(), email, password });
     } catch (err) {
       if (axios.isAxiosError<ApiError>(err) && err.response?.status === 409) {
         setError("Ya hay una cuenta con ese correo.");
@@ -35,29 +44,39 @@ export default function RegisterPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3">
-        <h1 className="text-2xl font-bold">Crear cuenta</h1>
-        <label>
-          Nombre
-          <input required maxLength={120} value={name} onChange={e => setName(e.target.value)} className={inputClass} />
-        </label>
-        <label>
-          Correo
-          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={inputClass} />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" required minLength={8} maxLength={72} value={password} onChange={e => setPassword(e.target.value)} className={inputClass} />
-        </label>
-        {error && <p role="alert" className="text-red-600">{error}</p>}
-        <button type="submit" disabled={sending} className="bg-slate-800 text-white rounded px-3 py-2 disabled:opacity-50">
-          {sending ? "Creando cuenta..." : "Crear cuenta"}
-        </button>
-        <p className="text-sm">
-          ¿Ya tienes cuenta? <Link to={ROUTES.login} className="underline">Iniciar sesión</Link>
-        </p>
-      </form>
-    </main>
+    <AuthShell title="Crea tu cuenta" onSubmit={handleSubmit}>
+      <TextField
+        label="Nombre"
+        autoComplete="name"
+        maxLength={120}
+        value={name}
+        onChange={e => setName(e.target.value)}
+        hint={<span className="font-normal text-ink-2">{name.length} de 120 caracteres</span>}
+      />
+      <TextField
+        label="Correo"
+        type="email"
+        autoComplete="email"
+        value={email}
+        invalid={emailBad}
+        onChange={e => { setEmail(e.target.value); setError(null); }}
+        hint={emailOk
+          ? <FieldMessage ok text="Correo válido" />
+          : emailBad && <FieldMessage ok={false} text="Escribe un correo válido, por ejemplo nombre@dominio.com" />}
+      />
+      <TextField
+        label="Contraseña"
+        type="password"
+        autoComplete="new-password"
+        maxLength={72}
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        hint={rules.map(rule => <FieldMessage key={rule.text} ok={rule.ok} text={rule.text} />)}
+      />
+      {error && <FormAlert message={error} />}
+      <Button type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Creando cuenta…" className="mt-1 h-[58px]">
+        Crear cuenta
+      </Button>
+    </AuthShell>
   );
 }

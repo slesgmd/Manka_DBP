@@ -1,3 +1,5 @@
+import PageHeader from "../components/PageHeader";
+
 export default function PantryPage() {
-  return <h1 className="text-2xl font-bold">Tu despensa</h1>;
+  return <PageHeader title="Tu despensa" />;
 }

@@ -1,20 +1,10 @@
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import type { LoginRequest, RegisterRequest, RoleName, User } from "../types/auth";
+import { AuthContext } from "./AuthContextObject";
 import * as authService from "../services/authService";
 import { SESSION_EXPIRED_EVENT } from "../services/api";
 import { clearTokens, getRefreshToken } from "../services/tokenStorage";
-
-interface AuthContextType {
-  user: User | null;
-  loading: boolean;
-  login: (data: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
-  logout: () => Promise<void>;
-  hasRole: (role: RoleName) => boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -63,10 +53,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
-  return ctx;
 }

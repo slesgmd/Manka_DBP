@@ -1,22 +1,28 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
-import { ROUTES } from "../routes";
-
-const inputClass = "w-full border rounded px-3 py-2";
+import AuthShell from "../components/AuthShell";
+import Button from "../components/ui/Button";
+import FieldMessage from "../components/ui/FieldMessage";
+import FormAlert from "../components/ui/FormAlert";
+import TextField from "../components/ui/TextField";
+import { useAuth } from "../hooks/useAuth";
+import { isValidEmail } from "../utils/validation";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
 
+  const emailOk = isValidEmail(email);
+  const emailBad = email.length > 0 && !emailOk;
+  const valid = emailOk && password.length > 0;
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (!valid || sending) return;
     setError(null);
     setSending(true);
     try {
@@ -32,25 +38,29 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-4">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm flex flex-col gap-3">
-        <h1 className="text-2xl font-bold">Iniciar sesión</h1>
-        <label>
-          Correo
-          <input type="email" required value={email} onChange={e => setEmail(e.target.value)} className={inputClass} />
-        </label>
-        <label>
-          Contraseña
-          <input type="password" required value={password} onChange={e => setPassword(e.target.value)} className={inputClass} />
-        </label>
-        {error && <p role="alert" className="text-red-600">{error}</p>}
-        <button type="submit" disabled={sending} className="bg-slate-800 text-white rounded px-3 py-2 disabled:opacity-50">
-          {sending ? "Entrando..." : "Iniciar sesión"}
-        </button>
-        <p className="text-sm">
-          ¿No tienes cuenta? <Link to={ROUTES.register} state={location.state} className="underline">Crear cuenta</Link>
-        </p>
-      </form>
-    </main>
+    <AuthShell title="Hola de nuevo" onSubmit={handleSubmit}>
+      <TextField
+        label="Correo"
+        type="email"
+        autoComplete="email"
+        value={email}
+        invalid={emailBad}
+        onChange={e => { setEmail(e.target.value); setError(null); }}
+        hint={emailOk
+          ? <FieldMessage ok text="Correo válido" />
+          : emailBad && <FieldMessage ok={false} text="Escribe un correo válido, por ejemplo nombre@dominio.com" />}
+      />
+      <TextField
+        label="Contraseña"
+        type="password"
+        autoComplete="current-password"
+        value={password}
+        onChange={e => { setPassword(e.target.value); setError(null); }}
+      />
+      {error && <FormAlert message={error} />}
+      <Button type="submit" kind="primary" disabled={!valid} loading={sending} loadingLabel="Entrando…" className="mt-1 h-[58px]">
+        Iniciar sesión
+      </Button>
+    </AuthShell>
   );
 }

@@ -1,0 +1,118 @@
+:root {
+  color-scheme: light;
+
+  --mk-title: #2A2D36;
+  --mk-ink: #16181D;
+  --mk-ink-2: #3A3D46;
+
+  --mk-base: #C9CEDC;
+  --mk-bg-desk: url("/fondos/bg-l-desk.jpg");
+  --mk-bg-mob: url("/fondos/bg-l-mob.jpg");
+  --mk-bg-login: url("/fondos/bg-l-login.jpg");
+
+  --mk-g-thick: rgba(255, 255, 255, 0.50);
+  --mk-g-dense: rgba(255, 255, 255, 0.78);
+  --mk-g-thin: rgba(255, 255, 255, 0.40);
+  --mk-g-arrow: rgba(255, 255, 255, 0.64);
+  --mk-g-solid: #F3F4F8;
+
+  --mk-hi: #FFFFFF;
+  --mk-rim: rgba(255, 255, 255, 0.78);
+  --mk-glow: rgba(255, 255, 255, 0.50);
+  --mk-low: rgba(130, 140, 185, 0.28);
+  --mk-halo: rgba(255, 255, 255, 0.55);
+  --mk-spec: rgba(255, 255, 255, 0.80);
+  --mk-spec-2: rgba(255, 255, 255, 0.55);
+  --mk-bev-a: #FFFFFF;
+  --mk-bev-b: rgba(255, 255, 255, 0.90);
+  --mk-drop: rgba(55, 65, 105, 0.24);
+  --mk-drop-2: rgba(55, 65, 105, 0.14);
+
+  --mk-sep: rgba(30, 34, 48, 0.12);
+  --mk-track: rgba(30, 34, 48, 0.12);
+  --mk-knob: rgba(255, 255, 255, 0.94);
+  --mk-scrim: rgba(30, 34, 48, 0.30);
+
+  --mk-cta: rgba(26, 28, 36, 0.86);
+  --mk-cta-solid: #1E2028;
+  --mk-cta-ink: #FFFFFF;
+  --mk-ring: #EEF0F6;
+  --mk-ring-track: rgba(255, 255, 255, 0.20);
+  --mk-bar: #2A2D36;
+  --mk-ok: #2F6B4F;
+  --mk-ok-tint: rgba(47, 107, 79, 0.12);
+  --mk-danger: #A3242F;
+  --mk-danger-glass: rgba(163, 36, 47, 0.86);
+  --mk-focus: var(--mk-ink);
+
+  --mk-gt-a: rgba(255, 255, 255, 0.98);
+  --mk-gt-b: rgba(214, 220, 238, 0.55);
+  --mk-gt-c: rgba(190, 198, 224, 0.45);
+  --mk-gt-stroke: rgba(255, 255, 255, 0.95);
+  --mk-gt-shadow: rgba(50, 60, 100, 0.30);
+
+  --mk-r-panel: 42px;
+  --mk-r-card: 30px;
+  --mk-r-inner: 28px;
+  --mk-r-thumb: 18px;
+  --mk-r-pill: 999px;
+
+  --mk-s-1: 4px; --mk-s-2: 8px; --mk-s-3: 12px; --mk-s-4: 16px; --mk-s-5: 20px;
+  --mk-s-6: 24px; --mk-s-8: 32px; --mk-s-11: 44px; --mk-s-16: 64px;
+  --mk-target: 44px;
+
+  --mk-dur-fast: 200ms;
+  --mk-dur-base: 250ms;
+  --mk-dur-slow: 350ms;
+  --mk-ease: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --mk-font: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --mk-title: #F2F4F8; --mk-ink: #FFFFFF; --mk-ink-2: #D9DCE5;
+  --mk-base: #0B0D14;
+  --mk-bg-desk: url("/fondos/bg-d-desk.jpg");
+  --mk-bg-mob: url("/fondos/bg-d-mob.jpg");
+  --mk-bg-login: url("/fondos/bg-d-login.jpg");
+  --mk-g-thick: rgba(20, 23, 32, 0.70); --mk-g-dense: rgba(16, 18, 26, 0.84);
+  --mk-g-thin: rgba(255, 255, 255, 0.10); --mk-g-arrow: rgba(20, 23, 32, 0.62); --mk-g-solid: #181B23;
+  --mk-hi: rgba(255, 255, 255, 0.75); --mk-rim: rgba(210, 222, 255, 0.30); --mk-glow: rgba(150, 175, 255, 0.10);
+  --mk-low: rgba(110, 140, 255, 0.16); --mk-halo: rgba(120, 150, 255, 0.16);
+  --mk-spec: rgba(255, 255, 255, 0.22); --mk-spec-2: rgba(190, 210, 255, 0.16);
+  --mk-bev-a: rgba(255, 255, 255, 0.95); --mk-bev-b: rgba(170, 195, 255, 0.60);
+  --mk-drop: rgba(0, 0, 0, 0.60); --mk-drop-2: rgba(0, 0, 0, 0.40);
+  --mk-sep: rgba(255, 255, 255, 0.14); --mk-track: rgba(255, 255, 255, 0.16); --mk-knob: rgba(255, 255, 255, 0.20);
+  --mk-scrim: rgba(0, 0, 0, 0.50);
+  --mk-cta: rgba(62, 67, 84, 0.90); --mk-cta-solid: #3A3F4F; --mk-ring-track: rgba(255, 255, 255, 0.18);
+  --mk-bar: #E6E9F2; --mk-ok: #8CCBA8; --mk-ok-tint: rgba(140, 203, 168, 0.14);
+  --mk-danger: #FF9AA1; --mk-danger-glass: rgba(163, 36, 47, 0.88);
+  --mk-gt-a: rgba(240, 244, 255, 0.92); --mk-gt-b: rgba(120, 140, 200, 0.35); --mk-gt-c: rgba(80, 100, 170, 0.30);
+  --mk-gt-stroke: rgba(205, 218, 255, 0.85); --mk-gt-shadow: rgba(0, 0, 0, 0.60);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --mk-title: #F2F4F8; --mk-ink: #FFFFFF; --mk-ink-2: #D9DCE5;
+    --mk-base: #0B0D14;
+    --mk-bg-desk: url("/fondos/bg-d-desk.jpg");
+    --mk-bg-mob: url("/fondos/bg-d-mob.jpg");
+    --mk-bg-login: url("/fondos/bg-d-login.jpg");
+    --mk-g-thick: rgba(20, 23, 32, 0.70); --mk-g-dense: rgba(16, 18, 26, 0.84);
+    --mk-g-thin: rgba(255, 255, 255, 0.10); --mk-g-arrow: rgba(20, 23, 32, 0.62); --mk-g-solid: #181B23;
+    --mk-hi: rgba(255, 255, 255, 0.75); --mk-rim: rgba(210, 222, 255, 0.30); --mk-glow: rgba(150, 175, 255, 0.10);
+    --mk-low: rgba(110, 140, 255, 0.16); --mk-halo: rgba(120, 150, 255, 0.16);
+    --mk-spec: rgba(255, 255, 255, 0.22); --mk-spec-2: rgba(190, 210, 255, 0.16);
+    --mk-bev-a: rgba(255, 255, 255, 0.95); --mk-bev-b: rgba(170, 195, 255, 0.60);
+    --mk-drop: rgba(0, 0, 0, 0.60); --mk-drop-2: rgba(0, 0, 0, 0.40);
+    --mk-sep: rgba(255, 255, 255, 0.14); --mk-track: rgba(255, 255, 255, 0.16); --mk-knob: rgba(255, 255, 255, 0.20);
+    --mk-scrim: rgba(0, 0, 0, 0.50);
+    --mk-cta: rgba(62, 67, 84, 0.90); --mk-cta-solid: #3A3F4F; --mk-ring-track: rgba(255, 255, 255, 0.18);
+    --mk-bar: #E6E9F2; --mk-ok: #8CCBA8; --mk-ok-tint: rgba(140, 203, 168, 0.14);
+    --mk-danger: #FF9AA1; --mk-danger-glass: rgba(163, 36, 47, 0.88);
+    --mk-gt-a: rgba(240, 244, 255, 0.92); --mk-gt-b: rgba(120, 140, 200, 0.35); --mk-gt-c: rgba(80, 100, 170, 0.30);
+    --mk-gt-stroke: rgba(205, 218, 255, 0.85); --mk-gt-shadow: rgba(0, 0, 0, 0.60);
+  }
+}

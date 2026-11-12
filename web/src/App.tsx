@@ -5,6 +5,7 @@ import Layout from "./components/Layout";
 import Loading from "./components/Loading";
 import PrivateRoute from "./components/PrivateRoute";
 import PublicRoute from "./components/PublicRoute";
+import LiquidFilters from "./components/ui/LiquidFilters";
 import { ROUTES } from "./routes";
 
 const LoginPage = lazy(() => import("./pages/LoginPage"));
@@ -22,6 +23,7 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage"));
 function App() {
   return (
     <BrowserRouter>
+      <LiquidFilters />
       <AuthProvider>
         <Suspense fallback={<Loading />}>
           <Routes>

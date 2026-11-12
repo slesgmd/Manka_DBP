@@ -1,56 +1,44 @@
 import { Suspense } from "react";
-import { NavLink, Outlet } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, Outlet } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import { ROUTES } from "../routes";
 import Breadcrumbs from "./Breadcrumbs";
 import Loading from "./Loading";
-
-const links = [
-  { to: ROUTES.home, label: "Recomendaciones" },
-  { to: ROUTES.catalog, label: "Catálogo de platos" },
-  { to: ROUTES.pantry, label: "Despensa" },
-  { to: ROUTES.favorites, label: "Favoritos" },
-  { to: ROUTES.history, label: "Historial" },
-  { to: ROUTES.profile, label: "Perfil" },
-];
-
-const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `block rounded px-3 py-2 ${isActive ? "bg-slate-300 font-semibold" : "hover:bg-slate-200"}`;
+import Sidebar from "./Sidebar";
+import TabBar from "./TabBar";
+import Icon from "./ui/Icon";
+import ThemeToggle from "./ui/ThemeToggle";
 
 export default function Layout() {
-  const { user, logout, hasRole } = useAuth();
+  const { logout } = useAuth();
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-60 shrink-0 bg-slate-100 p-4 flex flex-col gap-4">
-        <p className="text-xl font-bold">Manka</p>
-        <nav>
-          <ul className="flex flex-col gap-1">
-            {links.map(link => (
-              <li key={link.to}>
-                <NavLink to={link.to} end className={linkClass}>{link.label}</NavLink>
-              </li>
-            ))}
-            {hasRole("ADMIN") && (
-              <li>
-                <NavLink to={ROUTES.admin} className={linkClass}>Administración</NavLink>
-              </li>
-            )}
-          </ul>
-        </nav>
-        <div className="mt-auto text-sm">
-          <p>{user?.name}</p>
-          <button type="button" onClick={logout} className="mt-2 underline">
-            Cerrar sesión
-          </button>
-        </div>
-      </aside>
-      <main className="flex-1 p-6">
-        <Breadcrumbs />
-        <Suspense fallback={<Loading />}>
-          <Outlet />
-        </Suspense>
-      </main>
+    <div className="flex min-h-screen gap-6 md:p-6">
+      <Sidebar className="sticky top-6 hidden h-[calc(100vh-48px)] min-h-[560px] md:flex" />
+
+      <div className="flex min-w-0 flex-1 flex-col gap-4 px-4 pb-28 pt-4 md:p-0">
+        <header className="glass flex h-16 items-center justify-between rounded-full pl-5 pr-2.5 md:hidden">
+          <Link to={ROUTES.home} aria-label="Manka, inicio" className="flex items-center gap-2">
+            <Icon name="logo" size={24} strokeWidth={1.7} />
+            <span className="text-[21px] font-medium tracking-[-0.03em] text-title">Manka</span>
+          </Link>
+          <div className="flex gap-2">
+            <ThemeToggle />
+            <button type="button" onClick={logout} aria-label="Cerrar sesión" className="glass glass-thin press inline-flex size-11 items-center justify-center rounded-full">
+              <Icon name="logout" />
+            </button>
+          </div>
+        </header>
+
+        <main className="flex flex-col gap-4">
+          <Breadcrumbs />
+          <Suspense fallback={<Loading />}>
+            <Outlet />
+          </Suspense>
+        </main>
+      </div>
+
+      <TabBar className="md:hidden" />
     </div>
   );
 }

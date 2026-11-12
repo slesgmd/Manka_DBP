@@ -16,13 +16,13 @@ export default function Breadcrumbs() {
   }
 
   return (
-    <nav aria-label="Migas de pan" className="mb-4 text-sm text-slate-600">
+    <nav aria-label="Migas de pan" className="glass glass-thin self-start rounded-full px-4 py-2 text-footnote font-medium">
       <ol className="flex gap-2">
         {crumbs.map((crumb, i) => (
           <li key={crumb.to} className="flex gap-2">
             {i > 0 && <span aria-hidden="true">›</span>}
             {i === crumbs.length - 1 ? (
-              <span aria-current="page">{crumb.label}</span>
+              <span aria-current="page" className="font-semibold">{crumb.label}</span>
             ) : (
               <Link to={crumb.to} className="hover:underline">{crumb.label}</Link>
             )}

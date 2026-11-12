@@ -1,1 +1,16 @@
-@import "tailwindcss";
+@import "./styles/tailwind.css";
+
+body {
+  min-height: 100vh;
+  background-attachment: fixed;
+}
+
+@media (max-width: 767px) {
+  body {
+    background-image: var(--mk-bg-mob);
+  }
+}
+
+.auth-bg {
+  background: var(--mk-base) var(--mk-bg-login) center / cover no-repeat;
+}
